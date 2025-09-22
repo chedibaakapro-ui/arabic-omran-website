@@ -52,7 +52,12 @@ export default {
           '3': 'hsl(var(--chart-3))',
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))'
-        }
+        },
+        // Custom Omran colors
+        'omran-teal': '#1B4848',
+        'omran-gold': '#DDAF37',
+        'omran-gray': '#B8B8B8',
+        'omran-light': '#f8f8f8'
       },
       borderRadius: {
         lg: 'var(--radius)',
