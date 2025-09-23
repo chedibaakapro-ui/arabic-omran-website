@@ -32,7 +32,7 @@ export default function AboutPage() {
                  <nav className="hidden lg:flex items-center space-x-8 space-x-reverse">
                       <Link href="/" className="text-gray-700 hover:text-omran-teal">الرئيسية</Link>
                       <Link href="/projects" className="text-gray-700 hover:text-omran-teal">المشاريع</Link>
-                       <a href="#" className="text-gray-700 hover:text-omran-teal">الأخبار</a>
+                      <Link href="/news" className="text-gray-700 hover:text-omran-teal">الأخبار</Link>
                       <Link href="/about" className="text-omran-teal font-semibold">من نحن</Link>
                 </nav> 
 
@@ -58,8 +58,8 @@ export default function AboutPage() {
             <div className="lg:w-1/2 mb-8 lg:mb-0">
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <Image
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=400&fit=crop&auto=format&q=80&fm=webp"
-                  alt="فريق مجلة عمران"
+                  src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&h=400&fit=crop&auto=format&q=80&fm=webp"
+                  alt="فريق مجلة عمران - فريق محترف متخصص في العقارات"
                   width={600}
                   height={400}
                   className="w-full h-auto object-cover"

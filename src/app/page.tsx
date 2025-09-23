@@ -80,7 +80,7 @@ export default function HomePage() {
           <nav className="hidden lg:flex items-center space-x-8 space-x-reverse">
             <Link href="/" className="text-omran-teal font-semibold">الرئيسية</Link>
             <Link href="/projects" className="text-gray-700 hover:text-omran-teal">المشاريع</Link>
-            <a href="#news" className="text-gray-700 hover:text-omran-teal">الأخبار</a>
+            <Link href="/news" className="text-gray-700 hover:text-omran-teal">الأخبار</Link>
             <Link href="/about" className="text-gray-700 hover:text-omran-teal">من نحن</Link>
           </nav>
 
@@ -131,15 +131,14 @@ export default function HomePage() {
                     تصفح المشاريع
                   </Button>
                 </Link>
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    document.getElementById('news')?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className="border-omran-gold text-omran-gold hover:bg-omran-gold hover:text-white px-8 py-3 rounded-full text-lg"
-                >
-                  اقرأ الأخبار
-                </Button>
+                <Link href="/news">
+                  <Button 
+                    variant="outline" 
+                    className="border-omran-gold text-omran-gold hover:bg-omran-gold hover:text-white px-8 py-3 rounded-full text-lg"
+                  >
+                    اقرأ الأخبار
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
@@ -235,6 +234,14 @@ export default function HomePage() {
               <NewsCard key={article.id} article={article} />
             ))}
           </div>
+
+          <div className="text-center mt-12">
+            <Link href="/news">
+              <Button className="bg-omran-gold hover:bg-omran-gold/90 text-white px-8 py-3 rounded-full">
+                عرض جميع الأخبار
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -257,7 +264,7 @@ export default function HomePage() {
               <h4 className="font-semibold text-white mb-4">المحتوى</h4>
               <ul className="space-y-2 text-sm text-gray-300">
                 <li><Link href="/projects" className="hover:text-omran-gold">المشاريع العقارية</Link></li>
-                <li><a href="#news" className="hover:text-omran-gold cursor-pointer">أخبار العقارات</a></li>
+                <li><Link href="/news" className="hover:text-omran-gold">أخبار العقارات</Link></li>
                 <li><a href="#newsletter" className="hover:text-omran-gold cursor-pointer">النشرة الإخبارية</a></li>
               </ul>
             </div>

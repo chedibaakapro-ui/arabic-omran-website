@@ -70,7 +70,7 @@ export default function ProjectsPage() {
          <nav className="hidden lg:flex items-center space-x-8 space-x-reverse">
                <Link href="/" className="text-gray-700 hover:text-omran-teal">الرئيسية</Link>
                <Link href="/projects" className="text-omran-teal font-semibold">المشاريع</Link>
-               <a href="#" className="text-gray-700 hover:text-omran-teal">الأخبار</a>
+               <Link href="/news" className="text-gray-700 hover:text-omran-teal">الأخبار</Link>
                <Link href="/about" className="text-gray-700 hover:text-omran-teal">من نحن</Link>
          </nav> 
 
