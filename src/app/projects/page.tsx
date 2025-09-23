@@ -7,6 +7,15 @@ export const metadata = {
   description: "اكتشف أحدث المشاريع العقارية والاستثمارية في المملكة العربية السعودية",
 };
 
+// Define proper TypeScript interface
+interface Project {
+  title: string;
+  location: string;
+  price: string;
+  type: string;
+  image: string;
+}
+
 export default function ProjectsPage() {
   return (
     <div className="min-h-screen bg-white">
@@ -129,7 +138,8 @@ function OmranLogo({ isDark = false }: { isDark?: boolean }) {
   );
 }
 
-function ProjectCard({ project }: { project: any }) {
+// Fixed ProjectCard component with proper TypeScript interface
+function ProjectCard({ project }: { project: Project }) {
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover-lift">
       <div className="relative h-48 overflow-hidden">
@@ -163,7 +173,7 @@ function ProjectCard({ project }: { project: any }) {
   );
 }
 
-const allProjects = [
+const allProjects: Project[] = [
   {
     title: "مجمع الواحة السكني الفاخر",
     location: "الرياض - حي النرجس",
