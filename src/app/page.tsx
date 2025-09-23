@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function HomePage() {
   return (
@@ -21,29 +22,31 @@ export default function HomePage() {
             اشترك الآن
           </Button>
 
-          {/* Navigation */}
+          {/* Navigation - Updated with Next.js Link */}
           <nav className="hidden lg:flex items-center space-x-8 space-x-reverse">
-            <a href="#" className="text-gray-700 hover:text-omran-teal">الرئيسية</a>
-            <a href="#" className="text-gray-700 hover:text-omran-teal">المشاريع</a>
+            <Link href="/" className="text-omran-teal font-semibold">الرئيسية</Link>
+            <Link href="/projects" className="text-gray-700 hover:text-omran-teal">المشاريع</Link>
             <a href="#" className="text-gray-700 hover:text-omran-teal">الأخبار</a>
             <a href="#" className="text-gray-700 hover:text-omran-teal">التحليلات</a>
             <a href="#" className="text-gray-700 hover:text-omran-teal">السوق العقاري</a>
-            <a href="#" className="text-gray-700 hover:text-omran-teal">من نحن</a>
+            <Link href="/about" className="text-gray-700 hover:text-omran-teal">من نحن</Link>
           </nav>
 
-          {/* Logo */}
+          {/* Logo - Updated with Link */}
           <div className="flex items-center">
-            <OmranLogo />
+            <Link href="/">
+              <OmranLogo />
+            </Link>
           </div>
         </div>
       </header>
 
-      {/* Hero Section */}
+      {/* Hero Section - Updated with better spacing */}
       <section className="bg-omran-light py-16 px-4">
         <div className="container mx-auto">
-          <div className="flex flex-col lg:flex-row items-center justify-between">
+          <div className="flex flex-col lg:flex-row items-center justify-between lg:gap-16">
             {/* Left side - Hero Image */}
-            <div className="lg:w-1/2 mb-8 lg:mb-0">
+            <div className="lg:w-1/2 mb-8 lg:mb-0 lg:order-1">
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <Image
                   src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&h=400&fit=crop&auto=format&q=80&fm=webp"
@@ -58,7 +61,7 @@ export default function HomePage() {
             </div>
 
             {/* Right side - Content */}
-            <div className="lg:w-1/2 text-center lg:text-right">
+            <div className="lg:w-1/2 text-center lg:text-right lg:order-0 lg:pr-8">
               <h1 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-6 leading-tight">
                 مجلتك الرائدة
                 <br />
@@ -71,9 +74,11 @@ export default function HomePage() {
                 ونصائح الاستثمار من خبراء السوق السعودي.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <Button className="bg-omran-teal hover:bg-omran-teal/90 text-white px-8 py-3 rounded-full text-lg">
-                  تصفح المشاريع
-                </Button>
+                <Link href="/projects">
+                  <Button className="bg-omran-teal hover:bg-omran-teal/90 text-white px-8 py-3 rounded-full text-lg w-full sm:w-auto">
+                    تصفح المشاريع
+                  </Button>
+                </Link>
                 <Button variant="outline" className="border-omran-gold text-omran-gold hover:bg-omran-gold hover:text-white px-8 py-3 rounded-full text-lg">
                   اقرأ الأخبار
                 </Button>
@@ -100,9 +105,11 @@ export default function HomePage() {
           </div>
 
           <div className="text-center mt-12">
-            <Button className="bg-omran-gold hover:bg-omran-gold/90 text-white px-8 py-3 rounded-full">
-              عرض جميع المشاريع
-            </Button>
+            <Link href="/projects">
+              <Button className="bg-omran-gold hover:bg-omran-gold/90 text-white px-8 py-3 rounded-full">
+                عرض جميع المشاريع
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
