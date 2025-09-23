@@ -1,19 +1,31 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
-
-export const metadata = {
-  title: "من نحن | مجلة عمران",
-  description: "تعرف على مجلة عمران، المجلة الرائدة للعقارات والاستثمار في المملكة العربية السعودية",
-};
+import { useState } from "react";
 
 export default function AboutPage() {
+  const [showSubscribeModal, setShowSubscribeModal] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
+
+  const handleSubscribe = () => {
+    setShowSubscribeModal(true);
+  };
+
+  const handleContact = () => {
+    setShowContactModal(true);
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="bg-white shadow-sm py-4 px-4">
         <div className="container mx-auto flex items-center justify-between">
-          <Button className="bg-omran-teal hover:bg-omran-teal/90 text-white px-6 py-2 rounded-full">
+          <Button 
+            onClick={handleSubscribe}
+            className="bg-omran-teal hover:bg-omran-teal/90 text-white px-6 py-2 rounded-full"
+          >
             اشترك الآن
           </Button>
 
@@ -128,20 +140,7 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {teamMembers.map((member, index) => (
-              <div key={index} className="text-center">
-                <div className="w-32 h-32 rounded-full overflow-hidden mx-auto mb-4 shadow-lg">
-                  <Image
-                    src={member.image}
-                    alt={member.name}
-                    width={128}
-                    height={128}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <h3 className="text-xl font-bold text-omran-teal mb-2">{member.name}</h3>
-                <p className="text-omran-gold font-semibold mb-3">{member.position}</p>
-                <p className="text-gray-600 text-sm">{member.description}</p>
-              </div>
+              <TeamMemberCard key={index} member={member} />
             ))}
           </div>
         </div>
@@ -175,16 +174,221 @@ export default function AboutPage() {
           <p className="text-gray-600 text-lg mb-8 max-w-2xl mx-auto">
             نحن نرحب بجميع الاستفسارات والاقتراحات. تواصل معنا وكن جزءاً من رحلة تطوير السوق العقاري السعودي
           </p>
-          <Button className="bg-omran-teal hover:bg-omran-teal/90 text-white px-8 py-3 rounded-full text-lg">
+          <Button 
+            onClick={handleContact}
+            className="bg-omran-teal hover:bg-omran-teal/90 text-white px-8 py-3 rounded-full text-lg"
+          >
             اتصل بنا
           </Button>
         </div>
       </section>
+
+      {/* Modals */}
+      {showSubscribeModal && (
+        <SubscribeModal onClose={() => setShowSubscribeModal(false)} />
+      )}
+      
+      {showContactModal && (
+        <ContactModal onClose={() => setShowContactModal(false)} />
+      )}
     </div>
   );
 }
 
-// Reuse the logo component
+// Team Member Card Component
+function TeamMemberCard({ member }: { member: typeof teamMembers[0] }) {
+  const handleViewProfile = () => {
+    alert(`${member.name}\n${member.position}\n\n${member.description}\n\nسيتم إضافة الملفات الشخصية المفصلة قريباً!`);
+  };
+
+  return (
+    <div className="text-center">
+      <div className="w-32 h-32 rounded-full overflow-hidden mx-auto mb-4 shadow-lg cursor-pointer" onClick={handleViewProfile}>
+        <Image
+          src={member.image}
+          alt={member.name}
+          width={128}
+          height={128}
+          className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+        />
+      </div>
+      <h3 className="text-xl font-bold text-omran-teal mb-2">{member.name}</h3>
+      <p className="text-omran-gold font-semibold mb-3">{member.position}</p>
+      <p className="text-gray-600 text-sm mb-4">{member.description}</p>
+      <Button
+        onClick={handleViewProfile}
+        variant="outline"
+        size="sm"
+        className="border-omran-teal text-omran-teal hover:bg-omran-teal hover:text-white"
+      >
+        عرض الملف الشخصي
+      </Button>
+    </div>
+  );
+}
+
+// Subscribe Modal Component
+function SubscribeModal({ onClose }: { onClose: () => void }) {
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    setTimeout(() => {
+      alert(`شكراً لك! تم تسجيل اشتراكك بنجاح باستخدام البريد الإلكتروني: ${email}`);
+      setIsSubmitting(false);
+      onClose();
+    }, 1000);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-md w-full p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold text-omran-teal">اشترك في النشرة الإخبارية</h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+        </div>
+        <p className="text-gray-600 mb-6">
+          احصل على أحدث الأخبار والتحليلات العقارية مباشرة في بريدك الإلكتروني
+        </p>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="أدخل بريدك الإلكتروني"
+            className="w-full p-3 border border-gray-300 rounded-md mb-4 text-right"
+            dir="rtl"
+          />
+          <div className="flex gap-3">
+            <Button type="submit" disabled={isSubmitting} className="flex-1 bg-omran-teal hover:bg-omran-teal/90 text-white">
+              {isSubmitting ? "جاري الإرسال..." : "اشترك الآن"}
+            </Button>
+            <Button type="button" variant="outline" onClick={onClose} className="flex-1">إلغاء</Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// Contact Modal Component
+function ContactModal({ onClose }: { onClose: () => void }) {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    subject: "",
+    message: ""
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    setTimeout(() => {
+      alert(`شكراً ${formData.name}! تم إرسال رسالتك بنجاح. سنتواصل معك قريباً عبر ${formData.email}`);
+      setIsSubmitting(false);
+      onClose();
+    }, 1500);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold text-omran-teal">تواصل معنا</h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="text"
+            name="name"
+            required
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="الاسم الكامل"
+            className="w-full p-3 border border-gray-300 rounded-md text-right"
+            dir="rtl"
+          />
+          
+          <input
+            type="email"
+            name="email"
+            required
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="البريد الإلكتروني"
+            className="w-full p-3 border border-gray-300 rounded-md text-right"
+            dir="rtl"
+          />
+          
+          <input
+            type="tel"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            placeholder="رقم الهاتف (اختياري)"
+            className="w-full p-3 border border-gray-300 rounded-md text-right"
+            dir="rtl"
+          />
+          
+          <input
+            type="text"
+            name="subject"
+            required
+            value={formData.subject}
+            onChange={handleChange}
+            placeholder="موضوع الرسالة"
+            className="w-full p-3 border border-gray-300 rounded-md text-right"
+            dir="rtl"
+          />
+          
+          <textarea
+            name="message"
+            required
+            value={formData.message}
+            onChange={handleChange}
+            placeholder="نص الرسالة"
+            rows={4}
+            className="w-full p-3 border border-gray-300 rounded-md text-right resize-vertical"
+            dir="rtl"
+          />
+          
+          <div className="flex gap-3 pt-2">
+            <Button type="submit" disabled={isSubmitting} className="flex-1 bg-omran-teal hover:bg-omran-teal/90 text-white">
+              {isSubmitting ? "جاري الإرسال..." : "إرسال الرسالة"}
+            </Button>
+            <Button type="button" variant="outline" onClick={onClose} className="flex-1">إلغاء</Button>
+          </div>
+        </form>
+        
+        <div className="mt-6 pt-4 border-t border-gray-200 text-center text-sm text-gray-600">
+          <p>أو تواصل معنا مباشرة:</p>
+          <p className="mt-2">
+            <a href="mailto:contact@omranmagazine.com" className="text-omran-teal hover:underline">
+              contact@omranmagazine.com
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Logo component
 function OmranLogo({ isDark = false }: { isDark?: boolean }) {
   const primaryColor = isDark ? "#DDAF37" : "#1B4848";
   const secondaryColor = isDark ? "#FFFFFF" : "#DDAF37";

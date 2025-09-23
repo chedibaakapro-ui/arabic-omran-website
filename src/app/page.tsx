@@ -1,10 +1,61 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+
+interface ProjectCardProps {
+  project: {
+    title: string;
+    location: string;
+    price: string;
+    type: string;
+    image: string;
+  };
+}
+
+interface NewsCardProps {
+  article: {
+    title: string;
+    summary: string;
+    date: string;
+    category: string;
+    image: string;
+    id: string;
+  };
+}
 
 export default function HomePage() {
+  const [email, setEmail] = useState("");
+  const [isSubscribing, setIsSubscribing] = useState(false);
+  const [subscribeMessage, setSubscribeMessage] = useState("");
+  const [showSubscribeModal, setShowSubscribeModal] = useState(false);
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      setSubscribeMessage("يرجى إدخال بريد إلكتروني صالح");
+      return;
+    }
+
+    setIsSubscribing(true);
+    // Simulate API call
+    setTimeout(() => {
+      setSubscribeMessage("شكراً لك! تم تسجيل اشتراكك بنجاح في النشرة الإخبارية");
+      setEmail("");
+      setIsSubscribing(false);
+      
+      // Clear message after 5 seconds
+      setTimeout(() => setSubscribeMessage(""), 5000);
+    }, 1000);
+  };
+
+  const handleSubscribeClick = () => {
+    setShowSubscribeModal(true);
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Top Banner */}
@@ -18,21 +69,24 @@ export default function HomePage() {
       <header className="bg-white shadow-sm py-4 px-4">
         <div className="container mx-auto flex items-center justify-between">
           {/* Subscribe Button */}
-          <Button className="bg-omran-teal hover:bg-omran-teal/90 text-white px-6 py-2 rounded-full">
+          <Button 
+            onClick={handleSubscribeClick}
+            className="bg-omran-teal hover:bg-omran-teal/90 text-white px-6 py-2 rounded-full"
+          >
             اشترك الآن
           </Button>
 
-          {/* Navigation - Updated with Next.js Link */}
+          {/* Navigation */}
           <nav className="hidden lg:flex items-center space-x-8 space-x-reverse">
             <Link href="/" className="text-omran-teal font-semibold">الرئيسية</Link>
             <Link href="/projects" className="text-gray-700 hover:text-omran-teal">المشاريع</Link>
-            <a href="#" className="text-gray-700 hover:text-omran-teal">الأخبار</a>
-            <a href="#" className="text-gray-700 hover:text-omran-teal">التحليلات</a>
+            <a href="#news" className="text-gray-700 hover:text-omran-teal">الأخبار</a>
+            <a href="#newsletter" className="text-gray-700 hover:text-omran-teal">التحليلات</a>
             <a href="#" className="text-gray-700 hover:text-omran-teal">السوق العقاري</a>
             <Link href="/about" className="text-gray-700 hover:text-omran-teal">من نحن</Link>
           </nav>
 
-          {/* Logo - Updated with Link */}
+          {/* Logo */}
           <div className="flex items-center">
             <Link href="/">
               <OmranLogo />
@@ -41,7 +95,7 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* Hero Section - Updated with better spacing */}
+      {/* Hero Section */}
       <section className="bg-omran-light py-16 px-4">
         <div className="container mx-auto">
           <div className="flex flex-col lg:flex-row items-center justify-between lg:gap-16">
@@ -79,7 +133,13 @@ export default function HomePage() {
                     تصفح المشاريع
                   </Button>
                 </Link>
-                <Button variant="outline" className="border-omran-gold text-omran-gold hover:bg-omran-gold hover:text-white px-8 py-3 rounded-full text-lg">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    document.getElementById('news')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="border-omran-gold text-omran-gold hover:bg-omran-gold hover:text-white px-8 py-3 rounded-full text-lg"
+                >
                   اقرأ الأخبار
                 </Button>
               </div>
@@ -125,18 +185,38 @@ export default function HomePage() {
           </div>
 
           <div className="bg-white p-8 rounded-lg border border-gray-200">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1">
-                <Input
-                  type="email"
-                  placeholder="أدخل بريدك الإلكتروني"
-                  className="text-right h-12"
-                />
+            <form onSubmit={handleNewsletterSubmit}>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1">
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="أدخل بريدك الإلكتروني"
+                    className="text-right h-12"
+                    required
+                  />
+                </div>
+                <Button 
+                  type="submit"
+                  disabled={isSubscribing}
+                  className="bg-omran-teal hover:bg-omran-teal/90 text-white px-8 h-12 rounded-md"
+                >
+                  {isSubscribing ? "جاري الإرسال..." : "اشترك الآن"}
+                </Button>
               </div>
-              <Button className="bg-omran-teal hover:bg-omran-teal/90 text-white px-8 h-12 rounded-md">
-                اشترك الآن
-              </Button>
-            </div>
+            </form>
+            
+            {subscribeMessage && (
+              <div className={`mt-4 p-3 rounded-md text-center ${
+                subscribeMessage.includes('شكراً') 
+                  ? 'bg-green-100 text-green-800' 
+                  : 'bg-red-100 text-red-800'
+              }`}>
+                {subscribeMessage}
+              </div>
+            )}
+            
             <p className="text-xs text-gray-500 mt-4 text-center">
               نحن نحترم خصوصيتك ولن نشارك بياناتك مع أطراف ثالثة
             </p>
@@ -145,7 +225,7 @@ export default function HomePage() {
       </section>
 
       {/* Latest News Section */}
-      <section className="py-16 px-4 bg-white">
+      <section id="news" className="py-16 px-4 bg-white">
         <div className="container mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-omran-teal mb-4">آخر الأخبار</h2>
@@ -153,8 +233,8 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {latestNews.map((article, index) => (
-              <NewsCard key={index} article={article} />
+            {latestNews.map((article) => (
+              <NewsCard key={article.id} article={article} />
             ))}
           </div>
         </div>
@@ -178,9 +258,9 @@ export default function HomePage() {
             <div className="text-center md:text-right">
               <h4 className="font-semibold text-white mb-4">المحتوى</h4>
               <ul className="space-y-2 text-sm text-gray-300">
-                <li><a href="#" className="hover:text-omran-gold">المشاريع العقارية</a></li>
-                <li><a href="#" className="hover:text-omran-gold">أخبار العقارات</a></li>
-                <li><a href="#" className="hover:text-omran-gold">تحليلات السوق</a></li>
+                <li><Link href="/projects" className="hover:text-omran-gold">المشاريع العقارية</Link></li>
+                <li><a href="#news" className="hover:text-omran-gold cursor-pointer">أخبار العقارات</a></li>
+                <li><a href="#newsletter" className="hover:text-omran-gold cursor-pointer">تحليلات السوق</a></li>
                 <li><a href="#" className="hover:text-omran-gold">نصائح الاستثمار</a></li>
               </ul>
             </div>
@@ -192,7 +272,7 @@ export default function HomePage() {
                 <li><a href="#" className="hover:text-omran-gold">تقييم المشاريع</a></li>
                 <li><a href="#" className="hover:text-omran-gold">استشارات عقارية</a></li>
                 <li><a href="#" className="hover:text-omran-gold">تقارير السوق</a></li>
-                <li><a href="#" className="hover:text-omran-gold">النشرة الإخبارية</a></li>
+                <li><a href="#newsletter" className="hover:text-omran-gold cursor-pointer">النشرة الإخبارية</a></li>
               </ul>
             </div>
 
@@ -200,7 +280,14 @@ export default function HomePage() {
             <div className="text-center md:text-right">
               <h4 className="font-semibold text-white mb-4">تواصل معنا</h4>
               <div className="space-y-2 text-sm text-gray-300">
-                <p>contact@omranmagazine.com</p>
+                <p>
+                  <a 
+                    href="mailto:contact@omranmagazine.com" 
+                    className="hover:text-omran-gold"
+                  >
+                    contact@omranmagazine.com
+                  </a>
+                </p>
                 <p>المملكة العربية السعودية</p>
               </div>
             </div>
@@ -213,49 +300,20 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+
+      {/* Subscribe Modal */}
+      {showSubscribeModal && (
+        <SubscribeModal onClose={() => setShowSubscribeModal(false)} />
+      )}
     </div>
   );
-}
-
-// Geometric Omran Logo Component
-function OmranLogo({ isDark = false }: { isDark?: boolean }) {
-  const primaryColor = isDark ? "#DDAF37" : "#1B4848";
-  const secondaryColor = isDark ? "#FFFFFF" : "#DDAF37";
-  
-  return (
-    <div className="flex items-center space-x-3 space-x-reverse">
-      <svg width="40" height="40" viewBox="0 0 40 40" className="flex-shrink-0">
-        {/* Geometric building blocks representing construction/real estate */}
-        <rect x="4" y="20" width="12" height="16" fill={primaryColor} />
-        <polygon points="4,20 10,12 16,20" fill={secondaryColor} />
-        <rect x="18" y="16" width="10" height="20" fill={primaryColor} />
-        <polygon points="18,16 23,8 28,16" fill={secondaryColor} />
-        <rect x="30" y="24" width="8" height="12" fill={primaryColor} />
-        <polygon points="30,24 34,18 38,24" fill={secondaryColor} />
-        {/* Accent geometric elements */}
-        <circle cx="34" cy="30" r="1.5" fill={secondaryColor} />
-        <rect x="20" y="28" width="6" height="1" fill={secondaryColor} />
-        <rect x="6" y="32" width="8" height="1" fill={secondaryColor} />
-      </svg>
-      <div className="flex flex-col">
-        <div className="text-xl font-bold" style={{ color: primaryColor }}>عمران</div>
-        <div className="text-xs font-medium tracking-wider" style={{ color: secondaryColor }}>OMRAN</div>
-      </div>
-    </div>
-  );
-}
-
-interface ProjectCardProps {
-  project: {
-    title: string;
-    location: string;
-    price: string;
-    type: string;
-    image: string;
-  };
 }
 
 function ProjectCard({ project }: ProjectCardProps) {
+  const handleViewDetails = () => {
+    alert(`تفاصيل المشروع: ${project.title}\n\nالموقع: ${project.location}\nالسعر: ${project.price}\nالنوع: ${project.type}\n\nسيتم إضافة صفحة التفاصيل قريباً!`);
+  };
+
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover-lift">
       <div className="relative h-48 overflow-hidden">
@@ -280,23 +338,23 @@ function ProjectCard({ project }: ProjectCardProps) {
           </svg>
           {project.location}
         </p>
-        <p className="text-omran-gold font-bold text-lg">{project.price}</p>
+        <p className="text-omran-gold font-bold text-lg mb-4">{project.price}</p>
+        <Button 
+          onClick={handleViewDetails}
+          className="w-full bg-omran-teal hover:bg-omran-teal/90 text-white"
+        >
+          عرض التفاصيل
+        </Button>
       </div>
     </div>
   );
 }
 
-interface NewsCardProps {
-  article: {
-    title: string;
-    summary: string;
-    date: string;
-    category: string;
-    image: string;
-  };
-}
-
 function NewsCard({ article }: NewsCardProps) {
+  const handleReadMore = () => {
+    alert(`مقال: ${article.title}\n\nالفئة: ${article.category}\nالتاريخ: ${article.date}\n\n${article.summary}\n\nسيتم إضافة صفحة المقال الكاملة قريباً!`);
+  };
+
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover-lift">
       <div className="relative h-48 overflow-hidden">
@@ -322,10 +380,105 @@ function NewsCard({ article }: NewsCardProps) {
         </p>
         <div className="flex justify-between items-center text-xs text-gray-500">
           <span>{article.date}</span>
-          <Button variant="ghost" className="text-omran-teal hover:text-omran-gold p-0 h-auto">
+          <Button 
+            variant="ghost" 
+            onClick={handleReadMore}
+            className="text-omran-teal hover:text-omran-gold p-0 h-auto"
+          >
             اقرأ المزيد
           </Button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// Subscribe Modal Component
+function SubscribeModal({ onClose }: { onClose: () => void }) {
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      alert(`شكراً لك! تم تسجيل اشتراكك بنجاح باستخدام البريد الإلكتروني: ${email}`);
+      setIsSubmitting(false);
+      onClose();
+    }, 1000);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-md w-full p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold text-omran-teal">اشترك في النشرة الإخبارية</h2>
+          <button 
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 text-2xl"
+          >
+            ×
+          </button>
+        </div>
+        <p className="text-gray-600 mb-6">
+          احصل على أحدث الأخبار والتحليلات العقارية مباشرة في بريدك الإلكتروني
+        </p>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="أدخل بريدك الإلكتروني"
+            className="w-full p-3 border border-gray-300 rounded-md mb-4 text-right"
+            dir="rtl"
+          />
+          <div className="flex gap-3">
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="flex-1 bg-omran-teal hover:bg-omran-teal/90 text-white"
+            >
+              {isSubmitting ? "جاري الإرسال..." : "اشترك الآن"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50"
+            >
+              إلغاء
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// Geometric Omran Logo Component
+function OmranLogo({ isDark = false }: { isDark?: boolean }) {
+  const primaryColor = isDark ? "#DDAF37" : "#1B4848";
+  const secondaryColor = isDark ? "#FFFFFF" : "#DDAF37";
+  
+  return (
+    <div className="flex items-center space-x-3 space-x-reverse">
+      <svg width="40" height="40" viewBox="0 0 40 40" className="flex-shrink-0">
+        <rect x="4" y="20" width="12" height="16" fill={primaryColor} />
+        <polygon points="4,20 10,12 16,20" fill={secondaryColor} />
+        <rect x="18" y="16" width="10" height="20" fill={primaryColor} />
+        <polygon points="18,16 23,8 28,16" fill={secondaryColor} />
+        <rect x="30" y="24" width="8" height="12" fill={primaryColor} />
+        <polygon points="30,24 34,18 38,24" fill={secondaryColor} />
+        <circle cx="34" cy="30" r="1.5" fill={secondaryColor} />
+        <rect x="20" y="28" width="6" height="1" fill={secondaryColor} />
+        <rect x="6" y="32" width="8" height="1" fill={secondaryColor} />
+      </svg>
+      <div className="flex flex-col">
+        <div className="text-xl font-bold" style={{ color: primaryColor }}>عمران</div>
+        <div className="text-xs font-medium tracking-wider" style={{ color: secondaryColor }}>OMRAN</div>
       </div>
     </div>
   );
@@ -357,6 +510,7 @@ const featuredProjects = [
 
 const latestNews = [
   {
+    id: "1",
     title: "ارتفاع أسعار العقارات السكنية في الرياض بنسبة 12% خلال الربع الأول",
     summary: "شهدت العاصمة نمواً ملحوظاً في قطاع العقارات مدفوعاً بالطلب المتزايد والمشاريع الحكومية الجديدة والاستثمارات الضخمة في البنية التحتية...",
     date: "22 سبتمبر 2025",
@@ -364,6 +518,7 @@ const latestNews = [
     image: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
   },
   {
+    id: "2",
     title: "إطلاق مشروع نيوم السكني الجديد بتكلفة 15 مليار ريال",
     summary: "أعلنت شركة نيوم عن إطلاق مشروع سكني متكامل يضم 50 ألف وحدة سكنية بمواصفات عالمية ومرافق ترفيهية متطورة تواكب رؤية المملكة 2030...",
     date: "21 سبتمبر 2025",
@@ -371,6 +526,7 @@ const latestNews = [
     image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
   },
   {
+    id: "3",
     title: "تحليل: توقعات نمو الاستثمار العقاري في المملكة لعام 2025",
     summary: "يتوقع الخبراء نمو الاستثمار العقاري بنسبة 18% مع تطبيق رؤية 2030 ومشاريع البنية التحتية الضخمة والإصلاحات الاقتصادية الجديدة...",
     date: "20 سبتمبر 2025",
