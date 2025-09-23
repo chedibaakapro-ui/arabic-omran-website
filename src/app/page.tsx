@@ -81,8 +81,6 @@ export default function HomePage() {
             <Link href="/" className="text-omran-teal font-semibold">الرئيسية</Link>
             <Link href="/projects" className="text-gray-700 hover:text-omran-teal">المشاريع</Link>
             <a href="#news" className="text-gray-700 hover:text-omran-teal">الأخبار</a>
-            <a href="#newsletter" className="text-gray-700 hover:text-omran-teal">التحليلات</a>
-            <a href="#" className="text-gray-700 hover:text-omran-teal">السوق العقاري</a>
             <Link href="/about" className="text-gray-700 hover:text-omran-teal">من نحن</Link>
           </nav>
 
@@ -243,7 +241,7 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="bg-omran-teal text-white py-12 px-4">
         <div className="container mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Company Info */}
             <div className="text-center md:text-right">
               <div className="flex items-center justify-center md:justify-start mb-4">
@@ -260,18 +258,6 @@ export default function HomePage() {
               <ul className="space-y-2 text-sm text-gray-300">
                 <li><Link href="/projects" className="hover:text-omran-gold">المشاريع العقارية</Link></li>
                 <li><a href="#news" className="hover:text-omran-gold cursor-pointer">أخبار العقارات</a></li>
-                <li><a href="#newsletter" className="hover:text-omran-gold cursor-pointer">تحليلات السوق</a></li>
-                <li><a href="#" className="hover:text-omran-gold">نصائح الاستثمار</a></li>
-              </ul>
-            </div>
-
-            {/* Services */}
-            <div className="text-center md:text-right">
-              <h4 className="font-semibold text-white mb-4">خدماتنا</h4>
-              <ul className="space-y-2 text-sm text-gray-300">
-                <li><a href="#" className="hover:text-omran-gold">تقييم المشاريع</a></li>
-                <li><a href="#" className="hover:text-omran-gold">استشارات عقارية</a></li>
-                <li><a href="#" className="hover:text-omran-gold">تقارير السوق</a></li>
                 <li><a href="#newsletter" className="hover:text-omran-gold cursor-pointer">النشرة الإخبارية</a></li>
               </ul>
             </div>

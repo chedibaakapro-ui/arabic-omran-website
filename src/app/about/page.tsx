@@ -29,14 +29,12 @@ export default function AboutPage() {
             اشترك الآن
           </Button>
 
-          <nav className="hidden lg:flex items-center space-x-8 space-x-reverse">
-            <Link href="/" className="text-gray-700 hover:text-omran-teal">الرئيسية</Link>
-            <Link href="/projects" className="text-gray-700 hover:text-omran-teal">المشاريع</Link>
-            <a href="#" className="text-gray-700 hover:text-omran-teal">الأخبار</a>
-            <a href="#" className="text-gray-700 hover:text-omran-teal">التحليلات</a>
-            <a href="#" className="text-gray-700 hover:text-omran-teal">السوق العقاري</a>
-            <Link href="/about" className="text-omran-teal font-semibold">من نحن</Link>
-          </nav>
+                 <nav className="hidden lg:flex items-center space-x-8 space-x-reverse">
+                      <Link href="/" className="text-gray-700 hover:text-omran-teal">الرئيسية</Link>
+                      <Link href="/projects" className="text-gray-700 hover:text-omran-teal">المشاريع</Link>
+                       <a href="#" className="text-gray-700 hover:text-omran-teal">الأخبار</a>
+                      <Link href="/about" className="text-omran-teal font-semibold">من نحن</Link>
+                </nav> 
 
           <div className="flex items-center">
             <Link href="/">
