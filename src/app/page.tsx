@@ -524,6 +524,6 @@ const latestNews = [
     summary: "يتوقع الخبراء نمو الاستثمار العقاري بنسبة 18% مع تطبيق رؤية 2030 ومشاريع البنية التحتية الضخمة والإصلاحات الاقتصادية الجديدة...",
     date: "20 سبتمبر 2025",
     category: "تحليلات",
-    image: "https://images.unsplash.com/photo-1590725175722-30bb1d6c5715?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
+    image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
   }
 ];
