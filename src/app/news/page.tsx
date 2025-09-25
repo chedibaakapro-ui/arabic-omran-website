@@ -3,14 +3,15 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { newsAPI } from "@/lib/api";
 
 interface NewsArticle {
   id: string;
   title: string;
   summary: string;
   content: string;
-  date: string;
+  createdAt: string;
   category: string;
   image: string;
   author: string;
@@ -23,6 +24,27 @@ export default function NewsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [visibleNews, setVisibleNews] = useState(NEWS_PER_PAGE);
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
+  const [allNewsArticles, setAllNewsArticles] = useState<NewsArticle[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // Load news from API on component mount
+  useEffect(() => {
+    const loadNews = async () => {
+      try {
+        setIsLoading(true);
+        const response = await newsAPI.getAll();
+        setAllNewsArticles(response.news || []);
+      } catch (error) {
+        console.error("Failed to load news:", error);
+        setError("فشل في تحميل الأخبار");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadNews();
+  }, []);
 
   // Filter news based on selected category
   const filteredNews = selectedCategory === "all" 
@@ -45,6 +67,24 @@ export default function NewsPage() {
 
   const handleSubscribe = () => {
     setShowSubscribeModal(true);
+  };
+
+  // Generate a default image for news articles without images
+  const getNewsImage = (article: NewsArticle, index: number) => {
+    if (article.image && article.image !== '') {
+      return article.image;
+    }
+    
+    // Use different default images based on category or index
+    const defaultImages = [
+      "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600&h=400&fit=crop&auto=format&q=80&fm=webp",
+      "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&h=400&fit=crop&auto=format&q=80&fm=webp", 
+      "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&h=400&fit=crop&auto=format&q=80&fm=webp",
+      "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&h=400&fit=crop&auto=format&q=80&fm=webp",
+      "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&h=400&fit=crop&auto=format&q=80&fm=webp",
+    ];
+    
+    return defaultImages[index % defaultImages.length];
   };
 
   return (
@@ -93,7 +133,7 @@ export default function NewsPage() {
               onClick={() => handleCategoryChange("all")}
               className={selectedCategory === "all" ? "bg-omran-teal text-white" : "border-omran-teal text-omran-teal hover:bg-omran-teal hover:text-white"}
             >
-              جميع الأخبار
+              جميع الأخبار ({allNewsArticles.length})
             </Button>
             <Button 
               variant={selectedCategory === "أخبار السوق" ? "default" : "outline"}
@@ -127,16 +167,49 @@ export default function NewsPage() {
         </div>
       </section>
 
+      {/* Loading State */}
+      {isLoading && (
+        <section className="py-16 px-4 bg-white">
+          <div className="container mx-auto text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-omran-teal mx-auto mb-4"></div>
+            <p className="text-gray-600">جاري تحميل الأخبار...</p>
+          </div>
+        </section>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <section className="py-16 px-4 bg-white">
+          <div className="container mx-auto text-center">
+            <div className="bg-red-50 border border-red-200 text-red-600 px-6 py-4 rounded-lg max-w-md mx-auto">
+              <p>{error}</p>
+              <Button 
+                onClick={() => window.location.reload()} 
+                className="mt-4 bg-omran-teal hover:bg-omran-teal/90 text-white px-4 py-2 rounded"
+              >
+                إعادة المحاولة
+              </Button>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Featured News */}
-      {selectedCategory === "all" && (
+      {!isLoading && !error && selectedCategory === "all" && allNewsArticles.length > 0 && (
         <section className="py-12 px-4 bg-white">
           <div className="container mx-auto">
             <h2 className="text-2xl font-bold text-omran-teal mb-8 text-center">الأخبار المميزة</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-              <FeaturedNewsCard article={allNewsArticles[0]} large />
+              <FeaturedNewsCard article={allNewsArticles[0]} getNewsImage={getNewsImage} index={0} large />
               <div className="space-y-6">
-                <FeaturedNewsCard article={allNewsArticles[1]} />
-                <FeaturedNewsCard article={allNewsArticles[2]} />
+                {allNewsArticles.slice(1, 3).map((article, index) => (
+                  <FeaturedNewsCard 
+                    key={article.id} 
+                    article={article} 
+                    getNewsImage={getNewsImage}
+                    index={index + 1}
+                  />
+                ))}
               </div>
             </div>
           </div>
@@ -144,51 +217,63 @@ export default function NewsPage() {
       )}
 
       {/* News Grid */}
-      <section className="py-16 px-4 bg-omran-light">
-        <div className="container mx-auto">
-          <h2 className="text-2xl font-bold text-omran-teal mb-8 text-center">
-            {selectedCategory === "all" ? "جميع الأخبار" : selectedCategory}
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {displayedNews.map((article) => (
-              <NewsCard key={article.id} article={article} />
-            ))}
+      {!isLoading && !error && (
+        <section className="py-16 px-4 bg-omran-light">
+          <div className="container mx-auto">
+            <h2 className="text-2xl font-bold text-omran-teal mb-8 text-center">
+              {selectedCategory === "all" ? "جميع الأخبار" : selectedCategory}
+            </h2>
+            
+            {filteredNews.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-600 text-lg mb-4">
+                  {selectedCategory === "all" ? "لا توجد أخبار متاحة حالياً" : `لا توجد أخبار في فئة "${selectedCategory}"`}
+                </p>
+                {selectedCategory !== "all" && (
+                  <Button 
+                    onClick={() => handleCategoryChange("all")}
+                    className="bg-omran-teal hover:bg-omran-teal/90 text-white px-6 py-2 rounded-full"
+                  >
+                    عرض جميع الأخبار
+                  </Button>
+                )}
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {displayedNews.map((article, index) => (
+                    <NewsCard 
+                      key={article.id} 
+                      article={article} 
+                      getNewsImage={getNewsImage}
+                      index={index}
+                    />
+                  ))}
+                </div>
+
+                {/* Load More */}
+                {hasMoreNews && (
+                  <div className="text-center mt-12">
+                    <Button 
+                      onClick={loadMoreNews}
+                      className="bg-omran-gold hover:bg-omran-gold/90 text-white px-8 py-3 rounded-full"
+                    >
+                      عرض المزيد من الأخبار ({filteredNews.length - visibleNews} متبقي)
+                    </Button>
+                  </div>
+                )}
+
+                {/* Show message when no more news */}
+                {!hasMoreNews && filteredNews.length > NEWS_PER_PAGE && (
+                  <div className="text-center mt-12">
+                    <p className="text-gray-600">تم عرض جميع الأخبار ({filteredNews.length} خبر)</p>
+                  </div>
+                )}
+              </>
+            )}
           </div>
-
-          {/* Load More */}
-          {hasMoreNews && (
-            <div className="text-center mt-12">
-              <Button 
-                onClick={loadMoreNews}
-                className="bg-omran-gold hover:bg-omran-gold/90 text-white px-8 py-3 rounded-full"
-              >
-                عرض المزيد من الأخبار ({filteredNews.length - visibleNews} متبقي)
-              </Button>
-            </div>
-          )}
-
-          {/* Show message when no more news */}
-          {!hasMoreNews && filteredNews.length > NEWS_PER_PAGE && (
-            <div className="text-center mt-12">
-              <p className="text-gray-600">تم عرض جميع الأخبار ({filteredNews.length} خبر)</p>
-            </div>
-          )}
-
-          {/* Show message when no news match filter */}
-          {filteredNews.length === 0 && (
-            <div className="text-center mt-12">
-              <p className="text-gray-600">لا توجد أخبار في هذه الفئة</p>
-              <Button 
-                onClick={() => handleCategoryChange("all")}
-                className="mt-4 bg-omran-teal hover:bg-omran-teal/90 text-white px-6 py-2 rounded-full"
-              >
-                عرض جميع الأخبار
-              </Button>
-            </div>
-          )}
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Newsletter Section */}
       <section className="py-16 px-4 bg-white">
@@ -208,6 +293,71 @@ export default function NewsPage() {
         </div>
       </section>
 
+      {/* Footer */}
+      <footer className="bg-omran-teal text-white py-12 px-4">
+        <div className="container mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Company Info */}
+            <div className="text-center md:text-right">
+              <div className="flex items-center justify-center md:justify-start mb-4">
+                <OmranLogo isDark />
+              </div>
+              <p className="text-gray-300 text-sm">
+                مجلتك الرائدة للعقارات والاستثمار في المملكة العربية السعودية
+              </p>
+            </div>
+
+            {/* Content */}
+            <div className="text-center md:text-right">
+              <h4 className="font-semibold text-white mb-4">المحتوى</h4>
+              <ul className="space-y-2 text-sm text-gray-300">
+                <li><Link href="/projects" className="hover:text-omran-gold">المشاريع العقارية</Link></li>
+                <li><Link href="/news" className="hover:text-omran-gold">أخبار العقارات</Link></li>
+                <li><Link href="/about" className="hover:text-omran-gold">من نحن</Link></li>
+              </ul>
+            </div>
+
+            {/* Contact */}
+            <div className="text-center md:text-right">
+              <h4 className="font-semibold text-white mb-4">تواصل معنا</h4>
+              <div className="space-y-2 text-sm text-gray-300">
+                <p>
+                  <a 
+                    href="mailto:contact@omranmagazine.com" 
+                    className="hover:text-omran-gold"
+                  >
+                    contact@omranmagazine.com
+                  </a>
+                </p>
+                <p>المملكة العربية السعودية</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-600 mt-8 pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <p className="text-sm text-gray-300 mb-4 md:mb-0">
+                جميع الحقوق محفوظة لدى مجلة عمران 2025
+              </p>
+              
+              {/* Admin Login Button */}
+              <Link href="/admin">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="border-gray-400 text-gray-300 hover:bg-gray-700 hover:text-white text-xs"
+                >
+                  <svg className="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clipRule="evenodd" />
+                  </svg>
+                  تسجيل دخول الإدارة
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </footer>
+
       {/* Subscribe Modal */}
       {showSubscribeModal && (
         <SubscribeModal onClose={() => setShowSubscribeModal(false)} />
@@ -217,17 +367,33 @@ export default function NewsPage() {
 }
 
 // Featured News Card Component
-function FeaturedNewsCard({ article, large = false }: { article: NewsArticle; large?: boolean }) {
+function FeaturedNewsCard({ 
+  article, 
+  large = false, 
+  getNewsImage, 
+  index 
+}: { 
+  article: NewsArticle; 
+  large?: boolean;
+  getNewsImage: (article: NewsArticle, index: number) => string;
+  index: number;
+}) {
   const handleReadMore = () => {
-    alert(`مقال: ${article.title}\n\nالكاتب: ${article.author}\nوقت القراءة: ${article.readTime}\nالتاريخ: ${article.date}\n\n${article.content}\n\nسيتم إضافة صفحة المقال الكاملة قريباً!`);
+    alert(`مقال: ${article.title}\n\nالكاتب: ${article.author}\nوقت القراءة: ${article.readTime}\nالتاريخ: ${new Date(article.createdAt).toLocaleDateString('ar-SA')}\n\n${article.content}\n\nسيتم إضافة صفحة المقال الكاملة قريباً!`);
   };
+
+  const displayDate = new Date(article.createdAt).toLocaleDateString('ar-SA', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
 
   if (large) {
     return (
       <div className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
         <div className="relative h-64 overflow-hidden">
           <Image
-            src={article.image}
+            src={getNewsImage(article, index)}
             alt={article.title}
             fill
             className="object-cover transition-transform duration-300 hover:scale-105"
@@ -247,7 +413,7 @@ function FeaturedNewsCard({ article, large = false }: { article: NewsArticle; la
           </p>
           <div className="flex justify-between items-center text-xs text-gray-500 mb-4">
             <span>{article.author}</span>
-            <span>{article.date}</span>
+            <span>{displayDate}</span>
             <span>{article.readTime}</span>
           </div>
           <Button 
@@ -265,7 +431,7 @@ function FeaturedNewsCard({ article, large = false }: { article: NewsArticle; la
     <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 flex">
       <div className="relative w-32 h-24 flex-shrink-0 overflow-hidden">
         <Image
-          src={article.image}
+          src={getNewsImage(article, index)}
           alt={article.title}
           fill
           className="object-cover"
@@ -276,7 +442,7 @@ function FeaturedNewsCard({ article, large = false }: { article: NewsArticle; la
           {article.title}
         </h4>
         <div className="flex justify-between items-center text-xs text-gray-500">
-          <span>{article.date}</span>
+          <span>{displayDate}</span>
           <Button 
             variant="ghost" 
             onClick={handleReadMore}
@@ -291,16 +457,30 @@ function FeaturedNewsCard({ article, large = false }: { article: NewsArticle; la
 }
 
 // Regular News Card Component
-function NewsCard({ article }: { article: NewsArticle }) {
+function NewsCard({ 
+  article, 
+  getNewsImage, 
+  index 
+}: { 
+  article: NewsArticle;
+  getNewsImage: (article: NewsArticle, index: number) => string;
+  index: number;
+}) {
   const handleReadMore = () => {
-    alert(`مقال: ${article.title}\n\nالكاتب: ${article.author}\nوقت القراءة: ${article.readTime}\nالفئة: ${article.category}\nالتاريخ: ${article.date}\n\n${article.content}\n\nسيتم إضافة صفحة المقال الكاملة قريباً!`);
+    alert(`مقال: ${article.title}\n\nالكاتب: ${article.author}\nوقت القراءة: ${article.readTime}\nالفئة: ${article.category}\nالتاريخ: ${new Date(article.createdAt).toLocaleDateString('ar-SA')}\n\n${article.content}\n\nسيتم إضافة صفحة المقال الكاملة قريباً!`);
   };
+
+  const displayDate = new Date(article.createdAt).toLocaleDateString('ar-SA', {
+    year: 'numeric',
+    month: 'long', 
+    day: 'numeric'
+  });
 
   return (
     <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 hover-lift">
       <div className="relative h-48 overflow-hidden">
         <Image
-          src={article.image}
+          src={getNewsImage(article, index)}
           alt={article.title}
           fill
           className="object-cover transition-transform duration-300 hover:scale-105"
@@ -320,7 +500,7 @@ function NewsCard({ article }: { article: NewsArticle }) {
         </p>
         <div className="flex justify-between items-center text-xs text-gray-500 mb-4">
           <span>{article.author}</span>
-          <span>{article.date}</span>
+          <span>{displayDate}</span>
           <span>{article.readTime}</span>
         </div>
         <Button 
@@ -423,117 +603,3 @@ function OmranLogo({ isDark = false }: { isDark?: boolean }) {
     </div>
   );
 }
-
-// Extended news data with proper content and images
-const allNewsArticles: NewsArticle[] = [
-  {
-    id: "1",
-    title: "ارتفاع أسعار العقارات السكنية في الرياض بنسبة 12% خلال الربع الأول",
-    summary: "شهدت العاصمة نمواً ملحوظاً في قطاع العقارات مدفوعاً بالطلب المتزايد والمشاريع الحكومية الجديدة والاستثمارات الضخمة في البنية التحتية مما أثر إيجاباً على السوق العقاري.",
-    content: "أظهرت البيانات الحديثة الصادرة عن وزارة الإسكان ارتفاعاً كبيراً في أسعار العقارات السكنية بالرياض بنسبة 12% خلال الربع الأول من العام الحالي. هذا الارتفاع يأتي نتيجة للطلب المتزايد على العقارات السكنية والمشاريع التطويرية الجديدة في العاصمة. كما ساهمت رؤية المملكة 2030 ومشاريع البنية التحتية الضخمة في تعزيز الثقة في السوق العقاري وجذب الاستثمارات المحلية والأجنبية.",
-    date: "22 سبتمبر 2025",
-    category: "أخبار السوق",
-    image: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600&h=400&fit=crop&auto=format&q=80&fm=webp",
-    author: "أحمد العبدالله",
-    readTime: "5 دقائق"
-  },
-  {
-    id: "2",
-    title: "إطلاق مشروع نيوم السكني الجديد بتكلفة 15 مليار ريال",
-    summary: "أعلنت شركة نيوم عن إطلاق مشروع سكني متكامل يضم 50 ألف وحدة سكنية بمواصفات عالمية ومرافق ترفيهية متطورة تواكب رؤية المملكة 2030.",
-    content: "في خطوة تاريخية نحو تحقيق رؤية المملكة 2030، أعلنت شركة نيوم عن إطلاق مشروع سكني ضخم بتكلفة تقدر بـ 15 مليار ريال سعودي. المشروع سيضم 50 ألف وحدة سكنية متنوعة تشمل الفلل والشقق والمنازل التاونهاوس، بالإضافة إلى مرافق ترفيهية وتعليمية وصحية متطورة. المشروع مصمم وفقاً لأعلى المعايير البيئية والتقنية ويهدف إلى استيعاب نمو السكان المتوقع في المنطقة.",
-    date: "21 سبتمبر 2025",
-    category: "مشاريع جديدة",
-    image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&h=400&fit=crop&auto=format&q=80&fm=webp",
-    author: "فاطمة المطيري",
-    readTime: "7 دقائق"
-  },
-  {
-    id: "3",
-    title: "تحليل: توقعات نمو الاستثمار العقاري في المملكة لعام 2025",
-    summary: "يتوقع الخبراء نمو الاستثمار العقاري بنسبة 18% مع تطبيق رؤية 2030 ومشاريع البنية التحتية الضخمة والإصلاحات الاقتصادية الجديدة.",
-    content: "تشير التوقعات الاقتصادية إلى نمو قوي في قطاع الاستثمار العقاري بنسبة تصل إلى 18% خلال عام 2025. هذا النمو مدفوع بعدة عوامل رئيسية منها مشاريع رؤية المملكة 2030، والاستثمارات الضخمة في البنية التحتية، وإطلاق مشاريع الترفيه والسياحة الكبرى. كما تساهم التسهيلات الحكومية الجديدة للمستثمرين الأجانب في جذب رؤوس أموال إضافية للسوق العقاري المحلي.",
-    date: "20 سبتمبر 2025",
-    category: "تحليلات",
-    image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&h=400&fit=crop&auto=format&q=80&fm=webp",
-    author: "خالد الشهراني",
-    readTime: "6 دقائق"
-  },
-  {
-    id: "4",
-    title: "افتتاح أكبر مجمع تسوق في جدة بمساحة 500 ألف متر مربع",
-    summary: "شهدت جدة افتتاح مجمع التسوق الأكبر في المنطقة الغربية، والذي يضم أكثر من 800 متجر ومطعم ومرافق ترفيهية عالمية.",
-    content: "احتفلت مدينة جدة بافتتاح أكبر مجمع تسوق في المنطقة الغربية بمساحة إجمالية تبلغ 500 ألف متر مربع. المجمع الجديد يضم أكثر من 800 متجر ومطعم، بالإضافة إلى مرافق ترفيهية متطورة تشمل دور السينما وألعاب الأطفال ومناطق الطعام الراقية. هذا المشروع الضخم سيساهم في تعزيز القطاع التجاري وخلق آلاف الوظائف الجديدة.",
-    date: "19 سبتمبر 2025",
-    category: "مشاريع جديدة",
-    image: "https://images.unsplash.com/photo-1555636222-cae831e670b3?w=600&h=400&fit=crop&auto=format&q=80&fm=webp",
-    author: "سارة القحطاني",
-    readTime: "4 دقائق"
-  },
-  {
-    id: "5",
-    title: "صندوق الاستثمارات العامة يطلق مبادرة للاستثمار العقاري بـ 50 مليار ريال",
-    summary: "أعلن صندوق الاستثمارات العامة عن مبادرة جديدة للاستثمار في المشاريع العقارية السكنية والتجارية بقيمة 50 مليار ريال.",
-    content: "في إطار جهود تنويع الاقتصاد وتحقيق رؤية المملكة 2030، أطلق صندوق الاستثمارات العامة مبادرة استثمارية ضخمة بقيمة 50 مليار ريال تستهدف تطوير المشاريع العقارية المتنوعة. المبادرة تشمل تطوير المجمعات السكنية والمراكز التجارية والمكاتب الإدارية في مختلف مناطق المملكة، مما سيساهم في تلبية الطلب المتزايد على العقارات وخلق فرص استثمارية جديدة.",
-    date: "18 سبتمبر 2025",
-    category: "استثمار",
-    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&h=400&fit=crop&auto=format&q=80&fm=webp",
-    author: "محمد العتيبي",
-    readTime: "8 دقائق"
-  },
-  {
-    id: "6",
-    title: "تقرير: الطلب على العقارات الفاخرة يرتفع 25% في الرياض",
-    summary: "أظهر تقرير حديث ارتفاعاً كبيراً في الطلب على العقارات الفاخرة والفلل في أحياء الرياض الراقية مدفوعاً بنمو الدخل والاستثمارات الجديدة.",
-    content: "كشف تقرير السوق العقاري الربعي عن ارتفاع الطلب على العقارات الفاخرة في العاصمة بنسبة 25% مقارنة بالعام الماضي. هذا الارتفاع يركز بشكل خاص على الفلل في أحياء النرجس والعليا والملقا. الخبراء يربطون هذا النمو بزيادة الدخل للطبقة الوسطى العليا وجذب المواهب العالمية للعمل في المملكة ضمن مشاريع رؤية 2030.",
-    date: "17 سبتمبر 2025",
-    category: "أخبار السوق",
-    image: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=600&h=400&fit=crop&auto=format&q=80&fm=webp",
-    author: "نورا الرشيد",
-    readTime: "5 دقائق"
-  },
-  {
-    id: "7",
-    title: "البنك المركزي يخفض معدلات الفائدة لدعم القروض العقارية",
-    summary: "قرر البنك المركزي السعودي تخفيض معدلات الفائدة بهدف تحفيز الإقراض العقاري وتسهيل الحصول على التمويل للمواطنين.",
-    content: "أعلن البنك المركزي السعودي عن قرار تخفيض معدلات الفائدة الأساسية بمقدار 0.5% لتصل إلى 4.75%، وذلك في إطار جهود دعم القطاع العقاري وتسهيل الحصول على القروض السكنية للمواطنين. هذا القرار متوقع أن يساهم في زيادة الطلب على العقارات وتحفيز النشاط الاقتصادي في القطاع، خاصة مع برامج الدعم الحكومية الأخرى مثل برنامج سكني.",
-    date: "16 سبتمبر 2025",
-    category: "أخبار السوق",
-    image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&h=400&fit=crop&auto=format&q=80&fm=webp",
-    author: "عبدالعزيز الدوسري",
-    readTime: "4 دقائق"
-  },
-  {
-    id: "8",
-    title: "مشروع القدية يعلن عن تطوير 30 ألف وحدة سكنية جديدة",
-    summary: "كشفت شركة القدية للاستثمار عن خطط لتطوير 30 ألف وحدة سكنية متنوعة ضمن مدينة القدية الترفيهية بتصاميم عصرية ومرافق متكاملة.",
-    content: "أعلنت شركة القدية للاستثمار عن مرحلة جديدة من التطوير تتضمن بناء 30 ألف وحدة سكنية متنوعة تشمل الشقق والفلل والمنازل التاونهاوس. هذا المشروع السكني سيكون جزءاً من مدينة القدية الترفيهية ويهدف إلى توفير بيئة سكنية متكاملة مع مرافق ترفيهية وتعليمية وصحية عالمية الجودة. المشروع متوقع أن يكتمل على عدة مراحل خلال السنوات القادمة.",
-    date: "15 سبتمبر 2025",
-    category: "مشاريع جديدة",
-    image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&h=400&fit=crop&auto=format&q=80&fm=webp",
-    author: "ريم العنزي",
-    readTime: "6 دقائق"
-  },
-  {
-    id: "9",
-    title: "دراسة: العقارات التجارية تحقق عوائد استثمارية تصل إلى 8% سنوياً",
-    summary: "أظهرت دراسة حديثة أن الاستثمار في العقارات التجارية يحقق عوائد مجزية تصل إلى 8% سنوياً مع توقعات بنمو إضافي.",
-    content: "كشفت دراسة أجراها معهد الاستثمار العقاري السعودي أن العقارات التجارية تحقق عوائد استثمارية قوية تتراوح بين 6-8% سنوياً. الدراسة شملت المراكز التجارية والمكاتب الإدارية والمستودعات في المدن الرئيسية. الخبراء يتوقعون استمرار هذا الأداء القوي مدفوعاً بنمو القطاعات الاقتصادية المختلفة والتوسع في الأنشطة التجارية.",
-    date: "14 سبتمبر 2025",
-    category: "تحليلات",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop&auto=format&q=80&fm=webp",
-    author: "حسام البلوي",
-    readTime: "7 دقائق"
-  },
-  {
-    id: "10",
-    title: "إطلاق منصة رقمية جديدة لتسهيل المعاملات العقارية",
-    summary: "أطلقت وزارة الإسكان منصة رقمية متطورة تهدف إلى تسهيل وتسريع المعاملات العقارية وتوفير الخدمات الحكومية إلكترونياً.",
-    content: "في إطار التحول الرقمي وتحسين الخدمات الحكومية، أطلقت وزارة الإسكان منصة رقمية جديدة تسمح بإنجاز المعاملات العقارية إلكترونياً. المنصة توفر خدمات متنوعة تشمل نقل الملكية والرهن العقاري وإصدار الصكوك، مما يوفر الوقت والجهد على المواطنين والمستثمرين. هذه المبادرة جزء من جهود المملكة لرقمنة الخدمات الحكومية وتحسين بيئة الأعمال.",
-    date: "13 سبتمبر 2025",
-    category: "تحليلات",
-    image: "https://images.unsplash.com/photo-1560472355-536de3962603?w=600&h=400&fit=crop&auto=format&q=80&fm=webp",
-    author: "لينا الغامدي",
-    readTime: "5 دقائق"
-  }
-];

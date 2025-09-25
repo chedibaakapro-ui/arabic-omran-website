@@ -4,27 +4,36 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { newsAPI, projectsAPI } from "@/lib/api";
 
 interface ProjectCardProps {
   project: {
+    id: string;
     title: string;
     location: string;
     price: string;
     type: string;
     image: string;
+    createdAt: string;
   };
+  getProjectImage: (project: any, index: number) => string;
+  index: number;
 }
 
 interface NewsCardProps {
   article: {
+    id: string;
     title: string;
     summary: string;
-    date: string;
+    createdAt: string;
     category: string;
     image: string;
-    id: string;
+    author: string;
+    readTime: string;
   };
+  getNewsImage: (article: any, index: number) => string;
+  index: number;
 }
 
 export default function HomePage() {
@@ -32,6 +41,44 @@ export default function HomePage() {
   const [isSubscribing, setIsSubscribing] = useState(false);
   const [subscribeMessage, setSubscribeMessage] = useState("");
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
+  
+  // State for API data
+  const [featuredProjects, setFeaturedProjects] = useState<any[]>([]);
+  const [latestNews, setLatestNews] = useState<any[]>([]);
+  const [isLoadingProjects, setIsLoadingProjects] = useState(true);
+  const [isLoadingNews, setIsLoadingNews] = useState(true);
+
+  // Load data from APIs on component mount
+  useEffect(() => {
+    const loadProjects = async () => {
+      try {
+        const response = await projectsAPI.getAll();
+        // Take only the first 3 projects for homepage
+        setFeaturedProjects((response.projects || []).slice(0, 3));
+      } catch (error) {
+        console.error("Failed to load projects:", error);
+        // Keep empty array on error
+      } finally {
+        setIsLoadingProjects(false);
+      }
+    };
+
+    const loadNews = async () => {
+      try {
+        const response = await newsAPI.getAll();
+        // Take only the first 3 news articles for homepage
+        setLatestNews((response.news || []).slice(0, 3));
+      } catch (error) {
+        console.error("Failed to load news:", error);
+        // Keep empty array on error
+      } finally {
+        setIsLoadingNews(false);
+      }
+    };
+
+    loadProjects();
+    loadNews();
+  }, []);
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,6 +101,47 @@ export default function HomePage() {
 
   const handleSubscribeClick = () => {
     setShowSubscribeModal(true);
+  };
+
+  // Generate default images for projects and news
+  const getProjectImage = (project: any, index: number) => {
+    if (project.image && project.image !== '') {
+      return project.image;
+    }
+    
+    const defaultImages = {
+      'سكني': [
+        "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
+        "https://images.unsplash.com/photo-1605146769289-440113cc3d00?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
+      ],
+      'تجاري': [
+        "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
+        "https://images.unsplash.com/photo-1555636222-cae831e670b3?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
+      ],
+      'مجمع سكني': [
+        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
+      ],
+      'فندقي': [
+        "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
+      ]
+    };
+
+    const typeImages = defaultImages[project.type as keyof typeof defaultImages] || defaultImages['سكني'];
+    return typeImages[index % typeImages.length];
+  };
+
+  const getNewsImage = (article: any, index: number) => {
+    if (article.image && article.image !== '') {
+      return article.image;
+    }
+    
+    const defaultImages = [
+      "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
+      "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
+      "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
+    ];
+    
+    return defaultImages[index % defaultImages.length];
   };
 
   return (
@@ -155,11 +243,38 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredProjects.map((project, index) => (
-              <ProjectCard key={index} project={project} />
-            ))}
-          </div>
+          {/* Loading State for Projects */}
+          {isLoadingProjects && (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-omran-teal mx-auto mb-4"></div>
+              <p className="text-gray-600">جاري تحميل المشاريع...</p>
+            </div>
+          )}
+
+          {/* Projects Grid */}
+          {!isLoadingProjects && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredProjects.length > 0 ? (
+                featuredProjects.map((project, index) => (
+                  <ProjectCard 
+                    key={project.id} 
+                    project={project} 
+                    getProjectImage={getProjectImage}
+                    index={index}
+                  />
+                ))
+              ) : (
+                <div className="col-span-full text-center py-8">
+                  <p className="text-gray-600 mb-4">لا توجد مشاريع متاحة حالياً</p>
+                  <Link href="/admin">
+                    <Button className="bg-omran-teal hover:bg-omran-teal/90 text-white px-6 py-2 rounded-full">
+                      إضافة مشاريع جديدة
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="text-center mt-12">
             <Link href="/projects">
@@ -229,11 +344,38 @@ export default function HomePage() {
             <p className="text-gray-600">تابع أحدث التطورات في السوق العقاري السعودي</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {latestNews.map((article) => (
-              <NewsCard key={article.id} article={article} />
-            ))}
-          </div>
+          {/* Loading State for News */}
+          {isLoadingNews && (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-omran-teal mx-auto mb-4"></div>
+              <p className="text-gray-600">جاري تحميل الأخبار...</p>
+            </div>
+          )}
+
+          {/* News Grid */}
+          {!isLoadingNews && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {latestNews.length > 0 ? (
+                latestNews.map((article, index) => (
+                  <NewsCard 
+                    key={article.id} 
+                    article={article} 
+                    getNewsImage={getNewsImage}
+                    index={index}
+                  />
+                ))
+              ) : (
+                <div className="col-span-full text-center py-8">
+                  <p className="text-gray-600 mb-4">لا توجد أخبار متاحة حالياً</p>
+                  <Link href="/admin">
+                    <Button className="bg-omran-teal hover:bg-omran-teal/90 text-white px-6 py-2 rounded-full">
+                      إضافة أخبار جديدة
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="text-center mt-12">
             <Link href="/news">
@@ -286,10 +428,26 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="border-t border-gray-600 mt-8 pt-8 text-center">
-            <p className="text-sm text-gray-300">
-              جميع الحقوق محفوظة لدى مجلة عمران 2025
-            </p>
+          <div className="border-t border-gray-600 mt-8 pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <p className="text-sm text-gray-300 mb-4 md:mb-0">
+                جميع الحقوق محفوظة لدى مجلة عمران 2025
+              </p>
+              
+              {/* Admin Login Button */}
+              <Link href="/admin">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="border-gray-400 text-gray-300 hover:bg-gray-700 hover:text-white text-xs"
+                >
+                  <svg className="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clipRule="evenodd" />
+                  </svg>
+                  تسجيل دخول الإدارة
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </footer>
@@ -302,16 +460,22 @@ export default function HomePage() {
   );
 }
 
-function ProjectCard({ project }: ProjectCardProps) {
+function ProjectCard({ project, getProjectImage, index }: ProjectCardProps) {
   const handleViewDetails = () => {
-    alert(`تفاصيل المشروع: ${project.title}\n\nالموقع: ${project.location}\nالسعر: ${project.price}\nالنوع: ${project.type}\n\nسيتم إضافة صفحة التفاصيل قريباً!`);
+    const displayDate = new Date(project.createdAt).toLocaleDateString('ar-SA', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    alert(`تفاصيل المشروع: ${project.title}\n\nالموقع: ${project.location}\nالسعر: ${project.price}\nالنوع: ${project.type}\nتاريخ الإضافة: ${displayDate}\n\nسيتم إضافة صفحة التفاصيل قريباً!`);
   };
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover-lift">
       <div className="relative h-48 overflow-hidden">
         <Image
-          src={project.image}
+          src={getProjectImage(project, index)}
           alt={project.title}
           width={400}
           height={300}
@@ -343,16 +507,28 @@ function ProjectCard({ project }: ProjectCardProps) {
   );
 }
 
-function NewsCard({ article }: NewsCardProps) {
+function NewsCard({ article, getNewsImage, index }: NewsCardProps) {
   const handleReadMore = () => {
-    alert(`مقال: ${article.title}\n\nالفئة: ${article.category}\nالتاريخ: ${article.date}\n\n${article.summary}\n\nسيتم إضافة صفحة المقال الكاملة قريباً!`);
+    const displayDate = new Date(article.createdAt).toLocaleDateString('ar-SA', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    alert(`مقال: ${article.title}\n\nالفئة: ${article.category}\nالتاريخ: ${displayDate}\nالكاتب: ${article.author}\n\n${article.summary}\n\nسيتم إضافة صفحة المقال الكاملة قريباً!`);
   };
+
+  const displayDate = new Date(article.createdAt).toLocaleDateString('ar-SA', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover-lift">
       <div className="relative h-48 overflow-hidden">
         <Image
-          src={article.image}
+          src={getNewsImage(article, index)}
           alt={article.title}
           width={400}
           height={300}
@@ -372,7 +548,7 @@ function NewsCard({ article }: NewsCardProps) {
           {article.summary}
         </p>
         <div className="flex justify-between items-center text-xs text-gray-500">
-          <span>{article.date}</span>
+          <span>{displayDate}</span>
           <Button 
             variant="ghost" 
             onClick={handleReadMore}
@@ -476,54 +652,3 @@ function OmranLogo({ isDark = false }: { isDark?: boolean }) {
     </div>
   );
 }
-
-const featuredProjects = [
-  {
-    title: "مجمع الواحة السكني الفاخر",
-    location: "الرياض - حي النرجس",
-    price: "من 850,000 ريال",
-    type: "سكني",
-    image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
-  },
-  {
-    title: "برج العاصمة التجاري",
-    location: "جدة - الكورنيش",
-    price: "من 1,200,000 ريال",
-    type: "تجاري",
-    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
-  },
-  {
-    title: "قرية البحيرات الذكية",
-    location: "الدمام - الخبر",
-    price: "من 950,000 ريال",
-    type: "مجمع سكني",
-    image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
-  }
-];
-
-const latestNews = [
-  {
-    id: "1",
-    title: "ارتفاع أسعار العقارات السكنية في الرياض بنسبة 12% خلال الربع الأول",
-    summary: "شهدت العاصمة نمواً ملحوظاً في قطاع العقارات مدفوعاً بالطلب المتزايد والمشاريع الحكومية الجديدة والاستثمارات الضخمة في البنية التحتية...",
-    date: "22 سبتمبر 2025",
-    category: "أخبار السوق",
-    image: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
-  },
-  {
-    id: "2",
-    title: "إطلاق مشروع نيوم السكني الجديد بتكلفة 15 مليار ريال",
-    summary: "أعلنت شركة نيوم عن إطلاق مشروع سكني متكامل يضم 50 ألف وحدة سكنية بمواصفات عالمية ومرافق ترفيهية متطورة تواكب رؤية المملكة 2030...",
-    date: "21 سبتمبر 2025",
-    category: "مشاريع جديدة",
-    image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
-  },
-  {
-    id: "3",
-    title: "تحليل: توقعات نمو الاستثمار العقاري في المملكة لعام 2025",
-    summary: "يتوقع الخبراء نمو الاستثمار العقاري بنسبة 18% مع تطبيق رؤية 2030 ومشاريع البنية التحتية الضخمة والإصلاحات الاقتصادية الجديدة...",
-    date: "20 سبتمبر 2025",
-    category: "تحليلات",
-    image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
-  }
-];
