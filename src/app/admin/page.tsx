@@ -11,6 +11,27 @@ interface Admin {
   name: string | null;
 }
 
+interface NewsItem {
+  id: string;
+  title: string;
+  summary: string;
+  content: string;
+  category: string;
+  createdAt: string;
+  author: string;
+  readTime: string;
+}
+
+interface ProjectItem {
+  id: string;
+  title: string;
+  location: string;
+  price: string;
+  type: string;
+  description?: string;
+  createdAt: string;
+}
+
 export default function AdminPage() {
   const [admin, setAdmin] = useState<Admin | null>(null);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'news' | 'projects'>('dashboard');
@@ -175,9 +196,9 @@ function DashboardOverview() {
 
 // Enhanced News Manager Component
 function EnhancedNewsManager() {
-  const [news, setNews] = useState<any[]>([]);
+  const [news, setNews] = useState<NewsItem[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [editingNews, setEditingNews] = useState<any>(null);
+  const [editingNews, setEditingNews] = useState<NewsItem | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     summary: "",
@@ -431,9 +452,9 @@ function EnhancedNewsManager() {
 
 // Enhanced Projects Manager Component  
 function EnhancedProjectsManager() {
-  const [projects, setProjects] = useState<any[]>([]);
+  const [projects, setProjects] = useState<ProjectItem[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [editingProject, setEditingProject] = useState<any>(null);
+  const [editingProject, setEditingProject] = useState<ProjectItem | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     location: "",

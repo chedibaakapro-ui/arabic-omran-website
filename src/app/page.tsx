@@ -17,7 +17,7 @@ interface ProjectCardProps {
     image: string;
     createdAt: string;
   };
-  getProjectImage: (project: any, index: number) => string;
+  getProjectImage: (project: ProjectCardProps['project'], index: number) => string;
   index: number;
 }
 
@@ -32,8 +32,29 @@ interface NewsCardProps {
     author: string;
     readTime: string;
   };
-  getNewsImage: (article: any, index: number) => string;
+  getNewsImage: (article: NewsCardProps['article'], index: number) => string;
   index: number;
+}
+
+interface FeaturedProject {
+  id: string;
+  title: string;
+  location: string;
+  price: string;
+  type: string;
+  image: string;
+  createdAt: string;
+}
+
+interface LatestNews {
+  id: string;
+  title: string;
+  summary: string;
+  createdAt: string;
+  category: string;
+  image: string;
+  author: string;
+  readTime: string;
 }
 
 export default function HomePage() {
@@ -43,8 +64,8 @@ export default function HomePage() {
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
   
   // State for API data
-  const [featuredProjects, setFeaturedProjects] = useState<any[]>([]);
-  const [latestNews, setLatestNews] = useState<any[]>([]);
+  const [featuredProjects, setFeaturedProjects] = useState<FeaturedProject[]>([]);
+  const [latestNews, setLatestNews] = useState<LatestNews[]>([]);
   const [isLoadingProjects, setIsLoadingProjects] = useState(true);
   const [isLoadingNews, setIsLoadingNews] = useState(true);
 
@@ -104,7 +125,7 @@ export default function HomePage() {
   };
 
   // Generate default images for projects and news
-  const getProjectImage = (project: any, index: number) => {
+  const getProjectImage = (project: FeaturedProject, index: number) => {
     if (project.image && project.image !== '') {
       return project.image;
     }
@@ -130,7 +151,7 @@ export default function HomePage() {
     return typeImages[index % typeImages.length];
   };
 
-  const getNewsImage = (article: any, index: number) => {
+  const getNewsImage = (article: LatestNews, index: number) => {
     if (article.image && article.image !== '') {
       return article.image;
     }
