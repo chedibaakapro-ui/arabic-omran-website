@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/Amel/OneDrive/Desktop/omran/src/app/ClientBody.tsx"],"sourcesContent":["\"use client\";\r\n\r\nimport { useEffect } from \"react\";\r\n\r\nexport default function ClientBody({\r\n  children,\r\n}: {\r\n  children: React.ReactNode;\r\n}) {\r\n  // Remove any extension-added classes during hydration\r\n  useEffect(() => {\r\n    // This runs only on the client after hydration\r\n    document.body.className = \"antialiased\";\r\n  }, []);\r\n\r\n  return <div className=\"antialiased\">{children}</div>;\r\n}\r\n"],"names":[],"mappings":";;;;;AAEA;;;AAFA;;AAIe,SAAS,WAAW,KAIlC;QAJkC,EACjC,QAAQ,EAGT,GAJkC;;IAKjC,sDAAsD;IACtD,IAAA,0MAAS;gCAAC;YACR,+CAA+C;YAC/C,SAAS,IAAI,CAAC,SAAS,GAAG;QAC5B;+BAAG,EAAE;IAEL,qBAAO,6NAAC;QAAI,WAAU;kBAAe;;;;;;AACvC;GAZwB;KAAA","debugId":null}}]
+}
