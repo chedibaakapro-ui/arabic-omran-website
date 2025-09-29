@@ -41,10 +41,18 @@ export default function AdminPage() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await authAPI.verify();
+        const token = localStorage.getItem('authToken');
+        
+        if (!token) {
+          setIsLoading(false);
+          return;
+        }
+        
+        const response = await authAPI.verify(token);
         setAdmin(response.admin);
       } catch (error) {
         console.log('No valid admin session');
+        localStorage.removeItem('authToken');
       } finally {
         setIsLoading(false);
       }
@@ -53,13 +61,15 @@ export default function AdminPage() {
     checkAuth();
   }, []);
 
-  const handleLoginSuccess = (adminData: Admin) => {
+  const handleLoginSuccess = (adminData: Admin, token: string) => {
+    localStorage.setItem('authToken', token);
     setAdmin(adminData);
   };
 
   const handleLogout = async () => {
     try {
       await authAPI.logout();
+      localStorage.removeItem('authToken');
       setAdmin(null);
       setActiveTab('dashboard');
     } catch (error) {
@@ -236,15 +246,21 @@ function EnhancedNewsManager() {
     setError("");
 
     try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        setError("يرجى تسجيل الدخول مرة أخرى");
+        return;
+      }
+
       if (editingNews) {
         // Update existing news
-        const response = await newsAPI.update(editingNews.id, formData);
+        const response = await newsAPI.update(editingNews.id, formData, token);
         setNews(news.map(item => item.id === editingNews.id ? response : item));
         setSuccessMessage("تم تحديث الخبر بنجاح!");
         setEditingNews(null);
       } else {
         // Create new news
-        const response = await newsAPI.create(formData);
+        const response = await newsAPI.create(formData, token);
         setNews([response, ...news]);
         setSuccessMessage("تم إضافة الخبر بنجاح!");
       }
@@ -275,7 +291,13 @@ function EnhancedNewsManager() {
     }
 
     try {
-      await newsAPI.delete(newsId);
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        setError("يرجى تسجيل الدخول مرة أخرى");
+        return;
+      }
+
+      await newsAPI.delete(newsId, token);
       setNews(news.filter(item => item.id !== newsId));
       setSuccessMessage("تم حذف الخبر بنجاح!");
     } catch (error) {
@@ -493,15 +515,21 @@ function EnhancedProjectsManager() {
     setError("");
 
     try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        setError("يرجى تسجيل الدخول مرة أخرى");
+        return;
+      }
+
       if (editingProject) {
         // Update existing project
-        const response = await projectsAPI.update(editingProject.id, formData);
+        const response = await projectsAPI.update(editingProject.id, formData, token);
         setProjects(projects.map(item => item.id === editingProject.id ? response : item));
         setSuccessMessage("تم تحديث المشروع بنجاح!");
         setEditingProject(null);
       } else {
         // Create new project
-        const response = await projectsAPI.create(formData);
+        const response = await projectsAPI.create(formData, token);
         setProjects([response, ...projects]);
         setSuccessMessage("تم إضافة المشروع بنجاح!");
       }
@@ -533,7 +561,13 @@ function EnhancedProjectsManager() {
     }
 
     try {
-      await projectsAPI.delete(projectId);
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        setError("يرجى تسجيل الدخول مرة أخرى");
+        return;
+      }
+
+      await projectsAPI.delete(projectId, token);
       setProjects(projects.filter(item => item.id !== projectId));
       setSuccessMessage("تم حذف المشروع بنجاح!");
     } catch (error) {
