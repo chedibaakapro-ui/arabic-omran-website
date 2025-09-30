@@ -5,12 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authAPI } from "@/lib/api";
+import { useTranslations } from 'next-intl';
 
 interface AdminLoginProps {
   onLoginSuccess: (admin: any, token: string) => void;
 }
 
 export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
+  const t = useTranslations('admin.login');
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -19,7 +21,7 @@ export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
     e.preventDefault();
     
     if (!email) {
-      setError("البريد الإلكتروني مطلوب");
+      setError(t('errorRequired'));
       return;
     }
 
@@ -32,11 +34,11 @@ export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
       if (response.token && response.admin) {
         onLoginSuccess(response.admin, response.token);
       } else {
-        setError("فشل تسجيل الدخول");
+        setError(t('errorFailed'));
       }
     } catch (error) {
       console.error("Login error:", error);
-      setError("فشل تسجيل الدخول. تحقق من البريد الإلكتروني أو حاول مرة أخرى.");
+      setError(t('errorFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -46,21 +48,21 @@ export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
     <div className="min-h-screen bg-omran-light flex items-center justify-center px-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-omran-teal mb-2">تسجيل دخول الإدارة</h1>
-          <p className="text-gray-600">أدخل بريدك الإلكتروني للوصول إلى لوحة التحكم</p>
+          <h1 className="text-3xl font-bold text-omran-teal mb-2">{t('title')}</h1>
+          <p className="text-gray-600">{t('description')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <Label htmlFor="email" className="text-right block mb-2">
-              البريد الإلكتروني
+              {t('emailLabel')}
             </Label>
             <Input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@example.com"
+              placeholder={t('emailPlaceholder')}
               className="text-right"
               dir="rtl"
               disabled={isLoading}
@@ -78,12 +80,12 @@ export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
             className="w-full bg-omran-teal hover:bg-omran-teal/90 text-white"
             disabled={isLoading}
           >
-            {isLoading ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
+            {isLoading ? t('loggingIn') : t('loginButton')}
           </Button>
 
           <div className="mt-4 text-center">
             <p className="text-sm text-gray-600">
-              يجب أن يكون البريد الإلكتروني مسجلاً مسبقاً في النظام
+              {t('note')}
             </p>
           </div>
         </form>

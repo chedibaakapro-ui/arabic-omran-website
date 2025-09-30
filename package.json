@@ -27,5 +27,8 @@
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "next-intl": "^4.3.9"
   }
 }

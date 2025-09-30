@@ -1,0 +1,270 @@
+{
+  "common": {
+    "subscribe": "Subscribe Now",
+    "readMore": "Read More",
+    "viewAll": "View All",
+    "viewDetails": "View Details",
+    "loadMore": "Load More",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "close": "Close",
+    "noData": "No data available"
+  },
+  "nav": {
+    "home": "Home",
+    "projects": "Projects",
+    "news": "News",
+    "about": "About Us"
+  },
+  "home": {
+    "hero": {
+      "title": "Your Leading Magazine\nfor Real Estate & Investment\nin Saudi Arabia",
+      "description": "We bring you the latest real estate news and analysis, the best residential and commercial projects, and investment advice from Saudi market experts.",
+      "browseProjects": "Browse Projects",
+      "readNews": "Read News"
+    },
+    "featuredProjects": {
+      "title": "Featured Projects",
+      "description": "Discover the latest leading real estate projects in the Kingdom of Saudi Arabia",
+      "viewAll": "View All Projects"
+    },
+    "newsletter": {
+      "title": "Newsletter",
+      "description": "Get the latest real estate news and analysis directly to your email",
+      "placeholder": "Enter your email",
+      "subscribeButton": "Subscribe Now",
+      "sending": "Sending...",
+      "successMessage": "Thank you! You have successfully subscribed to our newsletter",
+      "errorMessage": "Please enter a valid email address",
+      "privacyNote": "We respect your privacy and will never share your data with third parties"
+    },
+    "latestNews": {
+      "title": "Latest News",
+      "description": "Follow the latest developments in the Saudi real estate market",
+      "viewAll": "View All News"
+    },
+    "banner": "Discover the latest real estate projects and exclusive news in the Kingdom of Saudi Arabia"
+  },
+  "projects": {
+    "pageTitle": "Real Estate Projects",
+    "pageDescription": "Discover the latest leading real estate projects in the Kingdom of Saudi Arabia, from luxury residential complexes to commercial and investment centers",
+    "filters": {
+      "all": "All Projects",
+      "residential": "Residential",
+      "commercial": "Commercial",
+      "mixed": "Mixed-Use",
+      "hotel": "Hotel"
+    },
+    "loadMore": "Load More Projects ({count} remaining)",
+    "allShown": "Showing all projects ({count} projects)",
+    "noProjects": "No projects available at the moment",
+    "noProjectsInCategory": "No projects of type \"{type}\"",
+    "cta": {
+      "title": "Do You Have a Real Estate Project?",
+      "description": "Contact us to feature your real estate project in Omran Magazine and reach thousands of investors and real estate enthusiasts",
+      "button": "Contact Us Now"
+    }
+  },
+  "news": {
+    "pageTitle": "Latest News",
+    "pageDescription": "Follow the latest developments and news in the Saudi real estate market and real estate investments from Omran Magazine experts",
+    "categories": {
+      "all": "All News",
+      "market": "Market News",
+      "newProjects": "New Projects",
+      "analysis": "Analysis",
+      "investment": "Investment"
+    },
+    "featured": "Featured News",
+    "allNews": "All News",
+    "loadMore": "Load More News ({count} remaining)",
+    "allShown": "Showing all news ({count} articles)",
+    "noNews": "No news available at the moment",
+    "noNewsInCategory": "No news in \"{category}\" category",
+    "cta": {
+      "title": "Don't Miss Any Important News",
+      "description": "Subscribe to our newsletter and get the latest real estate news and analysis"
+    }
+  },
+  "about": {
+    "pageTitle": "About Us",
+    "intro": "Omran Magazine is the leading platform specialized in real estate and investment in the Kingdom of Saudi Arabia. We strive to provide high-quality content that helps investors and real estate enthusiasts make informed decisions based on scientific foundations.",
+    "mission": {
+      "title": "Our Mission",
+      "description": "We aim to empower investors and real estate enthusiasts by providing accurate information and in-depth analysis of the Saudi real estate market, helping them make successful investment decisions."
+    },
+    "vision": {
+      "title": "Our Vision",
+      "description": "To be the first and most trusted reference in real estate information and analysis in the Kingdom, and to contribute to building a more transparent and mature real estate market in line with Saudi Vision 2030."
+    },
+    "values": {
+      "title": "Our Values",
+      "description": "The principles we believe in and work through",
+      "transparency": {
+        "title": "Transparency",
+        "description": "We provide accurate and clear information away from misleading or exaggeration"
+      },
+      "expertise": {
+        "title": "Expertise",
+        "description": "A team of specialists and experts in real estate and investment"
+      },
+      "leadership": {
+        "title": "Leadership",
+        "description": "We always strive to be at the forefront and provide everything new and useful"
+      },
+      "credibility": {
+        "title": "Credibility",
+        "description": "We rely on reliable sources and official data in our analysis"
+      },
+      "quality": {
+        "title": "Quality",
+        "description": "We focus on providing high-quality content that meets our readers' needs"
+      },
+      "innovation": {
+        "title": "Innovation",
+        "description": "We use the latest technologies and methods in content delivery"
+      }
+    },
+    "team": {
+      "title": "Our Team",
+      "description": "Real estate and investment experts behind Omran Magazine",
+      "viewProfile": "View Profile"
+    },
+    "stats": {
+      "title": "Our Achievements in Numbers",
+      "description": "We are proud of the trust our readers and partners have placed in us",
+      "readers": "Monthly Readers",
+      "projects": "Featured Projects",
+      "reports": "Annual Reports",
+      "partners": "Partners"
+    },
+    "contact": {
+      "title": "Want to Contact Us?",
+      "description": "We welcome all inquiries and suggestions. Contact us and be part of the journey to develop the Saudi real estate market",
+      "button": "Contact Us"
+    }
+  },
+  "admin": {
+    "login": {
+      "title": "Admin Login",
+      "description": "Enter your email to access the control panel",
+      "emailLabel": "Email",
+      "emailPlaceholder": "admin@example.com",
+      "loginButton": "Login",
+      "loggingIn": "Logging in...",
+      "note": "Email must be pre-registered in the system",
+      "errorRequired": "Email is required",
+      "errorFailed": "Login failed. Check your email or try again."
+    },
+    "dashboard": {
+      "title": "Admin Dashboard",
+      "welcome": "Welcome,",
+      "logout": "Logout",
+      "tabs": {
+        "dashboard": "Dashboard",
+        "news": "News Management",
+        "projects": "Projects Management"
+      },
+      "overview": {
+        "title": "Welcome to the Dashboard",
+        "description": "From here you can manage Omran Magazine content, add, edit, and delete news and real estate projects."
+      }
+    },
+    "news": {
+      "title": "News Management",
+      "addNew": "Add New Article",
+      "edit": "Edit Article",
+      "create": "Add New Article",
+      "saved": "Saved Articles",
+      "fields": {
+        "title": "Title",
+        "category": "Category",
+        "summary": "Summary",
+        "content": "Content"
+      },
+      "actions": {
+        "save": "Save Article",
+        "update": "Update Article",
+        "delete": "Delete",
+        "edit": "Edit",
+        "saving": "Saving...",
+        "confirmDelete": "Are you sure you want to delete this article?"
+      },
+      "messages": {
+        "created": "Article added successfully!",
+        "updated": "Article updated successfully!",
+        "deleted": "Article deleted successfully!",
+        "errorRequired": "All fields are required"
+      }
+    },
+    "projects": {
+      "title": "Projects Management",
+      "addNew": "Add New Project",
+      "edit": "Edit Project",
+      "create": "Add New Project",
+      "saved": "Saved Projects",
+      "fields": {
+        "title": "Project Name",
+        "location": "Location",
+        "price": "Price",
+        "type": "Project Type",
+        "description": "Description (Optional)",
+        "pricePlaceholder": "From 850,000 SAR",
+        "descriptionPlaceholder": "Detailed project description..."
+      },
+      "types": {
+        "residential": "Residential",
+        "commercial": "Commercial",
+        "complex": "Residential Complex",
+        "hotel": "Hotel"
+      },
+      "actions": {
+        "save": "Save Project",
+        "update": "Update Project",
+        "delete": "Delete",
+        "edit": "Edit",
+        "saving": "Saving...",
+        "confirmDelete": "Are you sure you want to delete this project?"
+      },
+      "messages": {
+        "created": "Project added successfully!",
+        "updated": "Project updated successfully!",
+        "deleted": "Project deleted successfully!",
+        "errorRequired": "Title, location, and price are required"
+      }
+    }
+  },
+  "subscribeModal": {
+    "title": "Subscribe to Newsletter",
+    "description": "Get the latest real estate news and analysis directly to your email",
+    "placeholder": "Enter your email",
+    "subscribeButton": "Subscribe Now",
+    "subscribing": "Sending...",
+    "cancel": "Cancel"
+  },
+  "contactModal": {
+    "title": "Contact Us",
+    "fields": {
+      "name": "Full Name",
+      "email": "Email",
+      "phone": "Phone Number (Optional)",
+      "subject": "Subject",
+      "message": "Message"
+    },
+    "sendButton": "Send Message",
+    "sending": "Sending...",
+    "cancel": "Cancel",
+    "orContact": "Or contact us directly:"
+  },
+  "footer": {
+    "description": "Your leading magazine for real estate and investment in the Kingdom of Saudi Arabia",
+    "content": "Content",
+    "contact": "Contact Us",
+    "location": "Kingdom of Saudi Arabia",
+    "copyright": "All rights reserved to Omran Magazine 2025",
+    "adminLogin": "Admin Login"
+  }
+}
