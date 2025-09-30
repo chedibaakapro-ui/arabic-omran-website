@@ -214,14 +214,14 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="lg:w-1/2 text-right lg:order-0 lg:pr-8">
+            <div className={`lg:w-1/2 lg:order-0 lg:pr-8 ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
                 {t('home.hero.title')}
               </h1>
               <p className="text-gray-600 text-xl md:text-2xl mb-10 leading-relaxed">
                 {t('home.hero.description')}
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-end">
+              <div className={`flex flex-col sm:flex-row gap-4 ${locale === 'ar' ? 'justify-end' : 'justify-start'}`}>
                 <Link href={`/${locale}/projects`}>
                   <Button className="bg-omran-teal hover:bg-omran-teal/90 text-white px-8 py-3 rounded-full text-lg w-full sm:w-auto">
                     {t('home.hero.browseProjects')}
