@@ -71,12 +71,22 @@
   }
 
   /* RTL/LTR specific styles */
-  [dir="rtl"] body {
+  html[dir="rtl"] {
     direction: rtl;
   }
 
-  [dir="ltr"] body {
+  html[dir="ltr"] {
     direction: ltr;
+  }
+
+  html[dir="rtl"] body {
+    direction: rtl;
+    text-align: right;
+  }
+
+  html[dir="ltr"] body {
+    direction: ltr;
+    text-align: left;
   }
 
   /* Line clamp utilities */
