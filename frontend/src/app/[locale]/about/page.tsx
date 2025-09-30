@@ -99,7 +99,7 @@ export default function AboutPage() {
       <section className="bg-omran-light py-16 px-4">
         <div className="container mx-auto">
           <div className="flex flex-col lg:flex-row items-center justify-between">
-            <div className="lg:w-1/2 text-center lg:text-right">
+            <div className={`lg:w-1/2 ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
               <h1 className="text-4xl font-bold text-omran-teal mb-6">{t('about.pageTitle')}</h1>
               <p className="text-gray-600 text-lg mb-8 leading-relaxed">
                 {t('about.intro')}
@@ -125,8 +125,8 @@ export default function AboutPage() {
         <div className="container mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             {/* Mission */}
-            <div className="text-center">
-              <div className="w-16 h-16 bg-omran-teal rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
+              <div className="w-16 h-16 bg-omran-teal rounded-full flex items-center justify-center mb-6">
                 <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -138,8 +138,8 @@ export default function AboutPage() {
             </div>
 
             {/* Vision */}
-            <div className="text-center">
-              <div className="w-16 h-16 bg-omran-gold rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
+              <div className="w-16 h-16 bg-omran-gold rounded-full flex items-center justify-center mb-6">
                 <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
                   <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
@@ -164,8 +164,8 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {values.map((value, index) => (
-              <div key={index} className="bg-white p-8 rounded-lg text-center shadow-sm hover:shadow-lg transition-shadow">
-                <div className="w-12 h-12 bg-omran-teal/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div key={index} className={`bg-white p-8 rounded-lg shadow-sm hover:shadow-lg transition-shadow ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
+                <div className="w-12 h-12 bg-omran-teal/10 rounded-full flex items-center justify-center mb-4">
                   <div className="w-6 h-6 bg-omran-teal rounded-full"></div>
                 </div>
                 <h3 className="text-xl font-bold text-omran-teal mb-3">{value.title}</h3>
@@ -233,14 +233,14 @@ export default function AboutPage() {
       <footer className="bg-omran-teal text-white py-12 px-4">
         <div className="container mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center md:text-right">
-              <div className="flex items-center justify-center md:justify-start mb-4">
+            <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
+              <div className="flex items-center mb-4 justify-start">
                 <OmranLogo isDark />
               </div>
               <p className="text-gray-300 text-sm">{t('footer.description')}</p>
             </div>
 
-            <div className="text-center md:text-right">
+            <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
               <h4 className="font-semibold text-white mb-4">{t('footer.content')}</h4>
               <ul className="space-y-2 text-sm text-gray-300">
                 <li><Link href={`/${locale}/projects`} className="hover:text-omran-gold">{t('nav.projects')}</Link></li>
@@ -249,7 +249,7 @@ export default function AboutPage() {
               </ul>
             </div>
 
-            <div className="text-center md:text-right">
+            <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
               <h4 className="font-semibold text-white mb-4">{t('footer.contact')}</h4>
               <div className="space-y-2 text-sm text-gray-300">
                 <p>
