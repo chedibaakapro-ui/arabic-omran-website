@@ -49,9 +49,30 @@ export default function NewsPage() {
     loadNews();
   }, [t]);
 
+  const getNewsCategoryMapping = (filter: string) => {
+    const categoryMap: { [key: string]: string[] } = {
+      'market': ['أخبار السوق', 'Market News'],
+      'newProjects': ['مشاريع جديدة', 'New Projects'],
+      'analysis': ['تحليلات', 'Analysis'],
+      'investment': ['استثمار', 'Investment']
+    };
+    
+    for (const [key, values] of Object.entries(categoryMap)) {
+      if (values.some(v => v.toLowerCase() === filter.toLowerCase())) {
+        return values;
+      }
+    }
+    return [filter];
+  };
+
   const filteredNews = selectedCategory === "all" 
     ? allNewsArticles 
-    : allNewsArticles.filter(article => article.category === selectedCategory);
+    : allNewsArticles.filter(article => {
+        const matchingCategories = getNewsCategoryMapping(selectedCategory);
+        return matchingCategories.some(cat => 
+          article.category.toLowerCase() === cat.toLowerCase()
+        );
+      });
 
   const displayedNews = filteredNews.slice(0, visibleNews);
   const hasMoreNews = visibleNews < filteredNews.length;
@@ -133,30 +154,30 @@ export default function NewsPage() {
               {t('news.categories.all')} ({allNewsArticles.length})
             </Button>
             <Button 
-              variant={selectedCategory === "أخبار السوق" ? "default" : "outline"}
-              onClick={() => handleCategoryChange("أخبار السوق")}
-              className={selectedCategory === "أخبار السوق" ? "bg-omran-teal text-white" : "border-omran-teal text-omran-teal hover:bg-omran-teal hover:text-white"}
+              variant={selectedCategory === "market" ? "default" : "outline"}
+              onClick={() => handleCategoryChange("market")}
+              className={selectedCategory === "market" ? "bg-omran-teal text-white" : "border-omran-teal text-omran-teal hover:bg-omran-teal hover:text-white"}
             >
               {t('news.categories.market')}
             </Button>
             <Button 
-              variant={selectedCategory === "مشاريع جديدة" ? "default" : "outline"}
-              onClick={() => handleCategoryChange("مشاريع جديدة")}
-              className={selectedCategory === "مشاريع جديدة" ? "bg-omran-teal text-white" : "border-omran-teal text-omran-teal hover:bg-omran-teal hover:text-white"}
+              variant={selectedCategory === "newProjects" ? "default" : "outline"}
+              onClick={() => handleCategoryChange("newProjects")}
+              className={selectedCategory === "newProjects" ? "bg-omran-teal text-white" : "border-omran-teal text-omran-teal hover:bg-omran-teal hover:text-white"}
             >
               {t('news.categories.newProjects')}
             </Button>
             <Button 
-              variant={selectedCategory === "تحليلات" ? "default" : "outline"}
-              onClick={() => handleCategoryChange("تحليلات")}
-              className={selectedCategory === "تحليلات" ? "bg-omran-teal text-white" : "border-omran-teal text-omran-teal hover:bg-omran-teal hover:text-white"}
+              variant={selectedCategory === "analysis" ? "default" : "outline"}
+              onClick={() => handleCategoryChange("analysis")}
+              className={selectedCategory === "analysis" ? "bg-omran-teal text-white" : "border-omran-teal text-omran-teal hover:bg-omran-teal hover:text-white"}
             >
               {t('news.categories.analysis')}
             </Button>
             <Button 
-              variant={selectedCategory === "استثمار" ? "default" : "outline"}
-              onClick={() => handleCategoryChange("استثمار")}
-              className={selectedCategory === "استثمار" ? "bg-omran-teal text-white" : "border-omran-teal text-omran-teal hover:bg-omran-teal hover:text-white"}
+              variant={selectedCategory === "investment" ? "default" : "outline"}
+              onClick={() => handleCategoryChange("investment")}
+              className={selectedCategory === "investment" ? "bg-omran-teal text-white" : "border-omran-teal text-omran-teal hover:bg-omran-teal hover:text-white"}
             >
               {t('news.categories.investment')}
             </Button>
@@ -218,13 +239,13 @@ export default function NewsPage() {
         <section className="py-16 px-4 bg-omran-light">
           <div className="container mx-auto">
             <h2 className="text-2xl font-bold text-omran-teal mb-8 text-center">
-              {selectedCategory === "all" ? t('news.allNews') : selectedCategory}
+              {selectedCategory === "all" ? t('news.allNews') : t(`news.categories.${selectedCategory}`)}
             </h2>
             
             {filteredNews.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-gray-600 text-lg mb-4">
-                  {selectedCategory === "all" ? t('news.noNews') : t('news.noNewsInCategory', { category: selectedCategory })}
+                  {selectedCategory === "all" ? t('news.noNews') : t('news.noNewsInCategory', { category: t(`news.categories.${selectedCategory}`) })}
                 </p>
                 {selectedCategory !== "all" && (
                   <Button 
@@ -292,14 +313,14 @@ export default function NewsPage() {
       <footer className="bg-omran-teal text-white py-12 px-4">
         <div className="container mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center md:text-right">
-              <div className="flex items-center justify-center md:justify-start mb-4">
+            <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
+              <div className="flex items-center mb-4 justify-start">
                 <OmranLogo isDark />
               </div>
               <p className="text-gray-300 text-sm">{t('footer.description')}</p>
             </div>
 
-            <div className="text-center md:text-right">
+            <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
               <h4 className="font-semibold text-white mb-4">{t('footer.content')}</h4>
               <ul className="space-y-2 text-sm text-gray-300">
                 <li><Link href={`/${locale}/projects`} className="hover:text-omran-gold">{t('nav.projects')}</Link></li>
@@ -308,7 +329,7 @@ export default function NewsPage() {
               </ul>
             </div>
 
-            <div className="text-center md:text-right">
+            <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
               <h4 className="font-semibold text-white mb-4">{t('footer.contact')}</h4>
               <div className="space-y-2 text-sm text-gray-300">
                 <p><a href="mailto:contact@omranmagazine.com" className="hover:text-omran-gold">contact@omranmagazine.com</a></p>
@@ -338,7 +359,6 @@ export default function NewsPage() {
   );
 }
 
-// Component functions remain the same but with proper translations
 function FeaturedNewsCard({ 
   article, 
   large = false, 
