@@ -197,7 +197,7 @@ export default function HomePage() {
       </header>
 
       {/* Hero Section */}
-      <section className="bg-omran-light py-16 px-4">
+      <section className="bg-omran-light py-20 px-4">
         <div className="container mx-auto">
           <div className="flex flex-col lg:flex-row items-center justify-between lg:gap-16">
             <div className="lg:w-1/2 mb-8 lg:mb-0 lg:order-1">
@@ -214,14 +214,14 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="lg:w-1/2 text-center lg:text-right lg:order-0 lg:pr-8">
-              <h1 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-6 leading-tight whitespace-pre-line">
+            <div className="lg:w-1/2 text-right lg:order-0 lg:pr-8">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
                 {t('home.hero.title')}
               </h1>
-              <p className="text-gray-600 text-lg mb-8 max-w-lg mx-auto lg:mx-0">
+              <p className="text-gray-600 text-xl md:text-2xl mb-10 leading-relaxed">
                 {t('home.hero.description')}
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <div className="flex flex-col sm:flex-row gap-4 justify-end">
                 <Link href={`/${locale}/projects`}>
                   <Button className="bg-omran-teal hover:bg-omran-teal/90 text-white px-8 py-3 rounded-full text-lg w-full sm:w-auto">
                     {t('home.hero.browseProjects')}
