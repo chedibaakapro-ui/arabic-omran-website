@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Test</title>
+</head>
+<body style="padding: 20px;">
+    <h1>Image Loading Test</h1>
+    
+    <h2>Test 1: External Image (Unsplash)</h2>
+    <img src="https://images.unsplash.com/photo-1585665805456-e87f0ec446f5?w=300&h=200" 
+         alt="Unsplash test" 
+         style="border: 2px solid red; width: 300px; height: 200px; display: block; margin: 10px 0;">
+    
+    <h2>Test 2: Local SVG</h2>
+    <img src="/images/saudi-1.svg" 
+         alt="Local SVG test" 
+         style="border: 2px solid blue; width: 300px; height: 200px; display: block; margin: 10px 0;">
+    
+    <h2>Test 3: Inline Data URL</h2>
+    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect fill='%23ff0000' width='300' height='200'/%3E%3Ctext fill='white' x='50%25' y='50%25' text-anchor='middle' font-size='20'%3ETEST IMAGE%3C/text%3E%3C/svg%3E" 
+         alt="Data URL test" 
+         style="border: 2px solid green; width: 300px; height: 200px; display: block; margin: 10px 0;">
+    
+    <h2>Test 4: Simple Base64 Image</h2>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==" 
+         alt="Base64 test" 
+         style="border: 2px solid purple; width: 300px; height: 200px; display: block; margin: 10px 0; background: yellow;">
+
+    <p>What do you see above?</p>
+    <ul>
+        <li>Red border = Unsplash (external)</li>
+        <li>Blue border = Local SVG file</li>
+        <li>Green border = Inline SVG data URL</li>
+        <li>Purple border = Base64 image</li>
+    </ul>
+</body>
+</html>

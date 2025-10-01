@@ -5,12 +5,19 @@ const withNextIntl = createNextIntlPlugin('./i18n.ts');
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: [
-      'images.unsplash.com',
-      'ext.same-assets.com',
-      'ugc.same-assets.com'
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.unsplash.com',
+        pathname: '/**',
+      }
     ],
-    formats: ['image/webp', 'image/avif']
+    unoptimized: true
   },
   experimental: {
     optimizePackageImports: ['lucide-react']

@@ -124,20 +124,21 @@ export default function HomePage() {
       return project.image;
     }
     
+    // Saudi Arabian architecture images by project type
     const defaultImages = {
       'سكني': [
-        "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1605146769289-440113cc3d00?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
+        "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
       ],
       'تجاري': [
-        "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1555636222-cae831e670b3?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
+        "https://images.unsplash.com/photo-1585665805456-e87f0ec446f5?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
+        "https://images.unsplash.com/photo-1589395937772-e5380caebe6f?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
       ],
       'مجمع سكني': [
-        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
+        "https://images.unsplash.com/photo-1549888834-3ec93abae044?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
       ],
       'فندقي': [
-        "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
+        "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
       ]
     };
 
@@ -150,10 +151,11 @@ export default function HomePage() {
       return article.image;
     }
     
+    // Saudi Arabian real estate and investment news images
     const defaultImages = [
-      "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
-      "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
-      "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
+      "https://images.unsplash.com/photo-1585665805456-e87f0ec446f5?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
+      "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
+      "https://images.unsplash.com/photo-1549888834-3ec93abae044?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
     ];
     
     return defaultImages[index % defaultImages.length];
@@ -196,15 +198,15 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* Hero Section */}
+      {/* Hero Section - Saudi Architecture */}
       <section className="bg-omran-light py-20 px-4">
         <div className="container mx-auto">
           <div className="flex flex-col lg:flex-row items-center justify-between lg:gap-16">
             <div className="lg:w-1/2 mb-8 lg:mb-0 lg:order-1">
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <Image
-                  src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&h=400&fit=crop&auto=format&q=80&fm=webp"
-                  alt="Modern Saudi Arabian architecture"
+                  src="https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=600&h=400&fit=crop&auto=format&q=80&fm=webp"
+                  alt="Modern Saudi Arabian architecture skyline"
                   width={600}
                   height={400}
                   className="w-full h-auto object-cover"

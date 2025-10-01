@@ -48,15 +48,30 @@ export default function ProjectsPage() {
     loadProjects();
   }, [t]);
 
+  const getProjectTypeMapping = (filter: string) => {
+    const typeMap: { [key: string]: string[] } = {
+      'residential': ['سكني', 'Residential'],
+      'commercial': ['تجاري', 'Commercial'],
+      'mixed': ['مجمع سكني', 'Mixed-Use'],
+      'hotel': ['فندقي', 'Hotel']
+    };
+    
+    for (const [key, values] of Object.entries(typeMap)) {
+      if (values.some(v => v.toLowerCase() === filter.toLowerCase())) {
+        return values;
+      }
+    }
+    return [filter];
+  };
+
   const filteredProjects = selectedFilter === "all" 
     ? allProjects 
-    : allProjects.filter(project => 
-        project.type.toLowerCase().includes(selectedFilter.toLowerCase()) ||
-        (selectedFilter === "سكني" && project.type === "سكني") ||
-        (selectedFilter === "تجاري" && project.type === "تجاري") ||
-        (selectedFilter === "مختلط" && project.type === "مجمع سكني") ||
-        (selectedFilter === "فندقي" && project.type === "فندقي")
-      );
+    : allProjects.filter(project => {
+        const matchingTypes = getProjectTypeMapping(selectedFilter);
+        return matchingTypes.some(type => 
+          project.type.toLowerCase() === type.toLowerCase()
+        );
+      });
 
   const displayedProjects = filteredProjects.slice(0, visibleProjects);
   const hasMoreProjects = visibleProjects < filteredProjects.length;
@@ -80,23 +95,24 @@ export default function ProjectsPage() {
       return project.image;
     }
     
+    // Saudi Arabian real estate images by project type
     const defaultImages = {
       'سكني': [
-        "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1605146769289-440113cc3d00?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
+        "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
+        "https://images.unsplash.com/photo-1549888834-3ec93abae044?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
       ],
       'تجاري': [
-        "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1555636222-cae831e670b3?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
+        "https://images.unsplash.com/photo-1585665805456-e87f0ec446f5?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
+        "https://images.unsplash.com/photo-1589395937772-e5380caebe6f?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
+        "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
       ],
       'مجمع سكني': [
-        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
+        "https://images.unsplash.com/photo-1549888834-3ec93abae044?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
       ],
       'فندقي': [
-        "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
+        "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
+        "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
       ]
     };
 
@@ -156,30 +172,30 @@ export default function ProjectsPage() {
               {t('projects.filters.all')} ({allProjects.length})
             </Button>
             <Button 
-              variant={selectedFilter === "سكني" ? "default" : "outline"}
-              onClick={() => handleFilterChange("سكني")}
-              className={selectedFilter === "سكني" ? "bg-omran-teal text-white" : "border-omran-teal text-omran-teal hover:bg-omran-teal hover:text-white"}
+              variant={selectedFilter === "residential" ? "default" : "outline"}
+              onClick={() => handleFilterChange("residential")}
+              className={selectedFilter === "residential" ? "bg-omran-teal text-white" : "border-omran-teal text-omran-teal hover:bg-omran-teal hover:text-white"}
             >
               {t('projects.filters.residential')}
             </Button>
             <Button 
-              variant={selectedFilter === "تجاري" ? "default" : "outline"}
-              onClick={() => handleFilterChange("تجاري")}
-              className={selectedFilter === "تجاري" ? "bg-omran-teal text-white" : "border-omran-teal text-omran-teal hover:bg-omran-teal hover:text-white"}
+              variant={selectedFilter === "commercial" ? "default" : "outline"}
+              onClick={() => handleFilterChange("commercial")}
+              className={selectedFilter === "commercial" ? "bg-omran-teal text-white" : "border-omran-teal text-omran-teal hover:bg-omran-teal hover:text-white"}
             >
               {t('projects.filters.commercial')}
             </Button>
             <Button 
-              variant={selectedFilter === "مختلط" ? "default" : "outline"}
-              onClick={() => handleFilterChange("مختلط")}
-              className={selectedFilter === "مختلط" ? "bg-omran-teal text-white" : "border-omran-teal text-omran-teal hover:bg-omran-teal hover:text-white"}
+              variant={selectedFilter === "mixed" ? "default" : "outline"}
+              onClick={() => handleFilterChange("mixed")}
+              className={selectedFilter === "mixed" ? "bg-omran-teal text-white" : "border-omran-teal text-omran-teal hover:bg-omran-teal hover:text-white"}
             >
               {t('projects.filters.mixed')}
             </Button>
             <Button 
-              variant={selectedFilter === "فندقي" ? "default" : "outline"}
-              onClick={() => handleFilterChange("فندقي")}
-              className={selectedFilter === "فندقي" ? "bg-omran-teal text-white" : "border-omran-teal text-omran-teal hover:bg-omran-teal hover:text-white"}
+              variant={selectedFilter === "hotel" ? "default" : "outline"}
+              onClick={() => handleFilterChange("hotel")}
+              className={selectedFilter === "hotel" ? "bg-omran-teal text-white" : "border-omran-teal text-omran-teal hover:bg-omran-teal hover:text-white"}
             >
               {t('projects.filters.hotel')}
             </Button>
@@ -221,7 +237,7 @@ export default function ProjectsPage() {
             {filteredProjects.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-gray-600 text-lg mb-4">
-                  {selectedFilter === "all" ? t('projects.noProjects') : t('projects.noProjectsInCategory', { type: selectedFilter })}
+                  {selectedFilter === "all" ? t('projects.noProjects') : t('projects.noProjectsInCategory', { type: t(`projects.filters.${selectedFilter}`) })}
                 </p>
                 {selectedFilter !== "all" && (
                   <Button 
@@ -289,8 +305,8 @@ export default function ProjectsPage() {
       <footer className="bg-omran-teal text-white py-12 px-4">
         <div className="container mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center md:text-right">
-              <div className="flex items-center justify-center md:justify-start mb-4">
+            <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
+              <div className="flex items-center mb-4 justify-start">
                 <OmranLogo isDark />
               </div>
               <p className="text-gray-300 text-sm">
@@ -298,7 +314,7 @@ export default function ProjectsPage() {
               </p>
             </div>
 
-            <div className="text-center md:text-right">
+            <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
               <h4 className="font-semibold text-white mb-4">{t('footer.content')}</h4>
               <ul className="space-y-2 text-sm text-gray-300">
                 <li><Link href={`/${locale}/projects`} className="hover:text-omran-gold">{t('nav.projects')}</Link></li>
@@ -307,7 +323,7 @@ export default function ProjectsPage() {
               </ul>
             </div>
 
-            <div className="text-center md:text-right">
+            <div className={locale === 'ar' ? 'text-right' : 'text-left'}>
               <h4 className="font-semibold text-white mb-4">{t('footer.contact')}</h4>
               <div className="space-y-2 text-sm text-gray-300">
                 <p>

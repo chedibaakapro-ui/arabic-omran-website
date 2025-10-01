@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { newsAPI } from "@/lib/api";
@@ -37,7 +36,15 @@ export default function NewsPage() {
       try {
         setIsLoading(true);
         const response = await newsAPI.getAll();
-        setAllNewsArticles(response.news || []);
+        
+        // Use the articles as they come from the API - they already have images
+        const newsWithDefaults = (response.news || []).map((article: NewsArticle) => ({
+          ...article,
+          author: article.author || (locale === 'ar' ? 'فريق عمران' : 'Omran Team'),
+          readTime: article.readTime || (locale === 'ar' ? '5 دقائق' : '5 min read')
+        }));
+        
+        setAllNewsArticles(newsWithDefaults);
       } catch (error) {
         console.error("Failed to load news:", error);
         setError(t('common.error'));
@@ -47,7 +54,7 @@ export default function NewsPage() {
     };
 
     loadNews();
-  }, [t]);
+  }, [t, locale]);
 
   const getNewsCategoryMapping = (filter: string) => {
     const categoryMap: { [key: string]: string[] } = {
@@ -84,22 +91,6 @@ export default function NewsPage() {
 
   const loadMoreNews = () => {
     setVisibleNews(prev => Math.min(prev + NEWS_PER_PAGE, filteredNews.length));
-  };
-
-  const getNewsImage = (article: NewsArticle, index: number) => {
-    if (article.image && article.image !== '') {
-      return article.image;
-    }
-    
-    const defaultImages = [
-      "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600&h=400&fit=crop&auto=format&q=80&fm=webp",
-      "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&h=400&fit=crop&auto=format&q=80&fm=webp", 
-      "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&h=400&fit=crop&auto=format&q=80&fm=webp",
-      "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&h=400&fit=crop&auto=format&q=80&fm=webp",
-      "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&h=400&fit=crop&auto=format&q=80&fm=webp",
-    ];
-    
-    return defaultImages[index % defaultImages.length];
   };
 
   return (
@@ -218,14 +209,12 @@ export default function NewsPage() {
           <div className="container mx-auto">
             <h2 className="text-2xl font-bold text-omran-teal mb-8 text-center">{t('news.featured')}</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-              <FeaturedNewsCard article={allNewsArticles[0]} getNewsImage={getNewsImage} index={0} large />
+              <FeaturedNewsCard article={allNewsArticles[0]} large />
               <div className="space-y-6">
-                {allNewsArticles.slice(1, 3).map((article, index) => (
+                {allNewsArticles.slice(1, 3).map((article) => (
                   <FeaturedNewsCard 
                     key={article.id} 
-                    article={article} 
-                    getNewsImage={getNewsImage}
-                    index={index + 1}
+                    article={article}
                   />
                 ))}
               </div>
@@ -259,12 +248,10 @@ export default function NewsPage() {
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {displayedNews.map((article, index) => (
+                  {displayedNews.map((article) => (
                     <NewsCard 
                       key={article.id} 
-                      article={article} 
-                      getNewsImage={getNewsImage}
-                      index={index}
+                      article={article}
                     />
                   ))}
                 </div>
@@ -361,14 +348,10 @@ export default function NewsPage() {
 
 function FeaturedNewsCard({ 
   article, 
-  large = false, 
-  getNewsImage, 
-  index 
+  large = false
 }: { 
   article: NewsArticle; 
   large?: boolean;
-  getNewsImage: (article: NewsArticle, index: number) => string;
-  index: number;
 }) {
   const t = useTranslations();
   const locale = useLocale();
@@ -392,7 +375,11 @@ function FeaturedNewsCard({
     return (
       <div className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
         <div className="relative h-64 overflow-hidden">
-          <Image src={getNewsImage(article, index)} alt={article.title} fill className="object-cover transition-transform duration-300 hover:scale-105" />
+          <img 
+            src={article.image} 
+            alt={article.title} 
+            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+          />
           <div className="absolute top-4 right-4">
             <span className="inline-block bg-omran-gold/90 text-white px-3 py-1 rounded-full text-xs font-semibold">{article.category}</span>
           </div>
@@ -416,7 +403,11 @@ function FeaturedNewsCard({
   return (
     <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 flex">
       <div className="relative w-32 h-24 flex-shrink-0 overflow-hidden">
-        <Image src={getNewsImage(article, index)} alt={article.title} fill className="object-cover" />
+        <img 
+          src={article.image} 
+          alt={article.title} 
+          className="w-full h-full object-cover"
+        />
       </div>
       <div className="p-4 flex-1">
         <h4 className="text-sm font-bold text-omran-teal mb-2 line-clamp-2">{article.title}</h4>
@@ -431,7 +422,7 @@ function FeaturedNewsCard({
   );
 }
 
-function NewsCard({ article, getNewsImage, index }: { article: NewsArticle; getNewsImage: (article: NewsArticle, index: number) => string; index: number; }) {
+function NewsCard({ article }: { article: NewsArticle }) {
   const t = useTranslations();
   const locale = useLocale();
 
@@ -453,7 +444,11 @@ function NewsCard({ article, getNewsImage, index }: { article: NewsArticle; getN
   return (
     <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 hover-lift">
       <div className="relative h-48 overflow-hidden">
-        <Image src={getNewsImage(article, index)} alt={article.title} fill className="object-cover transition-transform duration-300 hover:scale-105" />
+        <img 
+          src={article.image} 
+          alt={article.title} 
+          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+        />
         <div className="absolute top-4 right-4">
           <span className="inline-block bg-omran-gold/90 text-white px-3 py-1 rounded-full text-xs font-semibold">{article.category}</span>
         </div>

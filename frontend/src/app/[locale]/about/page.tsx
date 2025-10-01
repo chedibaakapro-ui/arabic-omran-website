@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { useTranslations, useLocale } from 'next-intl';
@@ -21,7 +20,7 @@ export default function AboutPage() {
     setShowContactModal(true);
   };
 
-  // Team members with locale-aware content
+  // Team members with LOCAL Saudi Arabian professional images
   const teamMembers = [
     {
       name: locale === 'ar' ? "أحمد العبدالله" : "Ahmed Al-Abdullah",
@@ -29,7 +28,7 @@ export default function AboutPage() {
       description: locale === 'ar' 
         ? "خبير في السوق العقاري السعودي بخبرة تزيد عن 15 عاماً" 
         : "Expert in the Saudi real estate market with over 15 years of experience",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&auto=format&q=80&fm=webp"
+      image: "/images/saudi-4.svg"  // Using local SVG instead of Unsplash
     },
     {
       name: locale === 'ar' ? "فاطمة المطيري" : "Fatima Al-Mutairi",
@@ -37,7 +36,7 @@ export default function AboutPage() {
       description: locale === 'ar'
         ? "متخصصة في التحليلات الاستثمارية والدراسات الاقتصادية"
         : "Specialist in investment analysis and economic studies",
-      image: "https://images.unsplash.com/photo-1494790108755-2616c24671e5?w=150&h=150&fit=crop&auto=format&q=80&fm=webp"
+      image: "/images/saudi-5.svg"  // Using local SVG instead of Unsplash
     },
     {
       name: locale === 'ar' ? "خالد الشهراني" : "Khaled Al-Shahrani",
@@ -45,7 +44,7 @@ export default function AboutPage() {
       description: locale === 'ar'
         ? "خبير في تقييم المشاريع العقارية ودراسات الجدوى"
         : "Expert in real estate project evaluation and feasibility studies",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&auto=format&q=80&fm=webp"
+      image: "/images/saudi-6.svg"  // Using local SVG instead of Unsplash
     }
   ];
 
@@ -95,7 +94,7 @@ export default function AboutPage() {
         </div>
       </header>
 
-      {/* Hero Section */}
+      {/* Hero Section - Saudi Business Culture */}
       <section className="bg-omran-light py-16 px-4">
         <div className="container mx-auto">
           <div className="flex flex-col lg:flex-row items-center justify-between">
@@ -107,9 +106,9 @@ export default function AboutPage() {
             </div>
             <div className="lg:w-1/2 mb-8 lg:mb-0">
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                <Image
-                  src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&h=400&fit=crop&auto=format&q=80&fm=webp"
-                  alt="Omran Magazine Team"
+                <img
+                  src="/images/image-sau.jpg"
+                  alt="Omran Magazine Team - Saudi Arabian professionals"
                   width={600}
                   height={400}
                   className="w-full h-auto object-cover"
@@ -306,11 +305,9 @@ function TeamMemberCard({ member }: { member: typeof teamMembers[0] }) {
   return (
     <div className="text-center">
       <div className="w-32 h-32 rounded-full overflow-hidden mx-auto mb-4 shadow-lg cursor-pointer" onClick={handleViewProfile}>
-        <Image
+        <img
           src={member.image}
           alt={member.name}
-          width={128}
-          height={128}
           className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
         />
       </div>
