@@ -2,15 +2,16 @@
   "name": "omran-backend",
   "version": "1.0.0",
   "private": true,
-  "scripts": {
-    "dev": "nodemon --exec tsx src/server.ts",
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "db:migrate": "npx prisma migrate dev",
-    "db:generate": "npx prisma generate",
-    "db:seed": "npx prisma db seed",
-    "db:studio": "npx prisma studio"
-  },
+"scripts": {
+  "dev": "nodemon --exec tsx src/server.ts",
+  "build": "tsc",
+  "start": "node dist/server.js",
+  "db:generate": "prisma generate --schema=../prisma/schema.prisma",
+  "db:migrate": "prisma migrate deploy --schema=../prisma/schema.prisma",
+  "db:seed": "tsx ../prisma/seed.ts",
+  "db:studio": "prisma studio --schema=../prisma/schema.prisma",
+  "postinstall": "prisma generate --schema=../prisma/schema.prisma"
+},
   "prisma": {
     "seed": "tsx ../prisma/seed.ts"
   },
