@@ -5,11 +5,9 @@
     region: frankfurt
     plan: free
     rootDir: backend
-    buildCommand: npm install && npx prisma generate --schema=../prisma/schema.prisma && npm run build
-    startCommand: npm run start
+    buildCommand: npm install --include=dev && npx prisma generate --schema=../prisma/schema.prisma && npm run build
+    startCommand: NODE_ENV=production npm run start
     envVars:
-      - key: NODE_ENV
-        value: production
       - key: PORT
         value: 10000
       - key: DATABASE_URL
