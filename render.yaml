@@ -1,0 +1,21 @@
+﻿services:
+  - type: web
+    name: omran-backend
+    runtime: node
+    region: frankfurt
+    plan: free
+    rootDir: backend
+    buildCommand: npm install && npx prisma generate --schema=../prisma/schema.prisma && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_EMAILS
+        value: chedibaaka.pro@gmail.com,hussam@sauragency.com,hussambaaka@gmail.com
+    healthCheckPath: /health
