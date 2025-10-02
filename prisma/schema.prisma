@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Admin {
@@ -46,7 +47,7 @@ model Project {
   title       String
   location    String
   price       String
-  type        String    // "سكني", "تجاري", "مجمع سكني", "فندقي"
+  type        String // "سكني", "تجاري", "مجمع سكني", "فندقي"
   image       String
   description String?
   published   Boolean   @default(false)
