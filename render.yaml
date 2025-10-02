@@ -5,7 +5,7 @@
     region: frankfurt
     plan: free
     rootDir: backend
-    buildCommand: npm install --include=dev && npx prisma generate --schema=../prisma/schema.prisma && npx prisma migrate deploy --schema=../prisma/schema.prisma && npm run build
+    buildCommand: npm install --include=dev && npx prisma generate --schema=../prisma/schema.prisma && npx prisma db push --schema=../prisma/schema.prisma --accept-data-loss --skip-generate && npm run build
     startCommand: NODE_ENV=production npm run start
     envVars:
       - key: PORT
