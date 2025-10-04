@@ -37,7 +37,6 @@ export default function NewsPage() {
         setIsLoading(true);
         const response = await newsAPI.getAll();
         
-        // Use the articles as they come from the API - they already have images
         const newsWithDefaults = (response.news || []).map((article: NewsArticle) => ({
           ...article,
           author: article.author || (locale === 'ar' ? 'فريق عمران' : 'Omran Team'),
@@ -356,15 +355,6 @@ function FeaturedNewsCard({
   const t = useTranslations();
   const locale = useLocale();
 
-  const handleReadMore = () => {
-    const displayDate = new Date(article.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-    alert(`${article.title}\n\n${article.author}\n${article.readTime}\n${displayDate}\n\n${article.content}`);
-  };
-
   const displayDate = new Date(article.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', {
     year: 'numeric',
     month: 'long',
@@ -392,9 +382,11 @@ function FeaturedNewsCard({
             <span>{displayDate}</span>
             <span>{article.readTime}</span>
           </div>
-          <Button onClick={handleReadMore} className="w-full bg-omran-teal hover:bg-omran-teal/90 text-white">
-            {t('common.readMore')}
-          </Button>
+          <Link href={`/${locale}/news/${article.id}`}>
+            <Button className="w-full bg-omran-teal hover:bg-omran-teal/90 text-white">
+              {t('common.readMore')}
+            </Button>
+          </Link>
         </div>
       </div>
     );
@@ -413,9 +405,11 @@ function FeaturedNewsCard({
         <h4 className="text-sm font-bold text-omran-teal mb-2 line-clamp-2">{article.title}</h4>
         <div className="flex justify-between items-center text-xs text-gray-500">
           <span>{displayDate}</span>
-          <Button variant="ghost" onClick={handleReadMore} className="text-omran-teal hover:text-omran-gold p-0 h-auto text-xs">
-            {t('common.readMore')}
-          </Button>
+          <Link href={`/${locale}/news/${article.id}`}>
+            <Button variant="ghost" className="text-omran-teal hover:text-omran-gold p-0 h-auto text-xs">
+              {t('common.readMore')}
+            </Button>
+          </Link>
         </div>
       </div>
     </div>
@@ -425,15 +419,6 @@ function FeaturedNewsCard({
 function NewsCard({ article }: { article: NewsArticle }) {
   const t = useTranslations();
   const locale = useLocale();
-
-  const handleReadMore = () => {
-    const displayDate = new Date(article.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', {
-      year: 'numeric',
-      month: 'long', 
-      day: 'numeric'
-    });
-    alert(`${article.title}\n\n${article.author}\n${article.readTime}\n${article.category}\n${displayDate}\n\n${article.content}`);
-  };
 
   const displayDate = new Date(article.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', {
     year: 'numeric',
@@ -461,9 +446,11 @@ function NewsCard({ article }: { article: NewsArticle }) {
           <span>{displayDate}</span>
           <span>{article.readTime}</span>
         </div>
-        <Button onClick={handleReadMore} className="w-full bg-omran-teal hover:bg-omran-teal/90 text-white">
-          {t('common.readMore')}
-        </Button>
+        <Link href={`/${locale}/news/${article.id}`}>
+          <Button className="w-full bg-omran-teal hover:bg-omran-teal/90 text-white">
+            {t('common.readMore')}
+          </Button>
+        </Link>
       </div>
     </div>
   );

@@ -6,6 +6,11 @@ import { getMessages } from 'next-intl/server';
 export const metadata: Metadata = {
   title: "عمران | مجلة العقارات والاستثمار في السعودية",
   description: "مجلتك الرائدة للعقارات والاستثمار في المملكة العربية السعودية",
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
 };
 
 export default async function LocaleLayout({

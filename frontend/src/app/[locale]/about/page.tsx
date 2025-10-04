@@ -20,7 +20,7 @@ export default function AboutPage() {
     setShowContactModal(true);
   };
 
-  // Team members with LOCAL Saudi Arabian professional images
+  // Team members with actual professional photos
   const teamMembers = [
     {
       name: locale === 'ar' ? "أحمد العبدالله" : "Ahmed Al-Abdullah",
@@ -28,7 +28,7 @@ export default function AboutPage() {
       description: locale === 'ar' 
         ? "خبير في السوق العقاري السعودي بخبرة تزيد عن 15 عاماً" 
         : "Expert in the Saudi real estate market with over 15 years of experience",
-      image: "/images/saudi-4.svg"  // Using local SVG instead of Unsplash
+      image: "/images/team/ahmed-abdullah.jpg"
     },
     {
       name: locale === 'ar' ? "فاطمة المطيري" : "Fatima Al-Mutairi",
@@ -36,7 +36,7 @@ export default function AboutPage() {
       description: locale === 'ar'
         ? "متخصصة في التحليلات الاستثمارية والدراسات الاقتصادية"
         : "Specialist in investment analysis and economic studies",
-      image: "/images/saudi-5.svg"  // Using local SVG instead of Unsplash
+      image: "/images/team/fatima-mutairi.jpg"
     },
     {
       name: locale === 'ar' ? "خالد الشهراني" : "Khaled Al-Shahrani",
@@ -44,7 +44,7 @@ export default function AboutPage() {
       description: locale === 'ar'
         ? "خبير في تقييم المشاريع العقارية ودراسات الجدوى"
         : "Expert in real estate project evaluation and feasibility studies",
-      image: "/images/saudi-6.svg"  // Using local SVG instead of Unsplash
+      image: "/images/team/khaled-shahrani.jpg"
     }
   ];
 
@@ -304,7 +304,7 @@ function TeamMemberCard({ member }: { member: typeof teamMembers[0] }) {
 
   return (
     <div className="text-center">
-      <div className="w-32 h-32 rounded-full overflow-hidden mx-auto mb-4 shadow-lg cursor-pointer" onClick={handleViewProfile}>
+      <div className="w-40 h-40 rounded-full overflow-hidden mx-auto mb-4 shadow-lg cursor-pointer border-4 border-omran-teal/10" onClick={handleViewProfile}>
         <img
           src={member.image}
           alt={member.name}

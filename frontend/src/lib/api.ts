@@ -29,7 +29,7 @@ export const authAPI = {
   }
 }
 
-// News API
+// News API - Updated with FormData support
 export const newsAPI = {
   getAll: async () => {
     const response = await fetch(`${API_URL}/api/news`, {
@@ -47,27 +47,25 @@ export const newsAPI = {
     return response.json()
   },
 
-  create: async (data: any, token: string) => {
+  create: async (formData: FormData, token: string) => {
     const response = await fetch(`${API_URL}/api/news`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify(data)
+      body: formData
     })
     if (!response.ok) throw new Error('Failed to create news')
     return response.json()
   },
 
-  update: async (id: string, data: any, token: string) => {
+  update: async (id: string, formData: FormData, token: string) => {
     const response = await fetch(`${API_URL}/api/news/${id}`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify(data)
+      body: formData
     })
     if (!response.ok) throw new Error('Failed to update news')
     return response.json()
@@ -83,7 +81,7 @@ export const newsAPI = {
   }
 }
 
-// Projects API
+// Projects API - Updated with FormData support
 export const projectsAPI = {
   getAll: async () => {
     const response = await fetch(`${API_URL}/api/projects`, {
@@ -101,27 +99,25 @@ export const projectsAPI = {
     return response.json()
   },
 
-  create: async (data: any, token: string) => {
+  create: async (formData: FormData, token: string) => {
     const response = await fetch(`${API_URL}/api/projects`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify(data)
+      body: formData
     })
     if (!response.ok) throw new Error('Failed to create project')
     return response.json()
   },
 
-  update: async (id: string, data: any, token: string) => {
+  update: async (id: string, formData: FormData, token: string) => {
     const response = await fetch(`${API_URL}/api/projects/${id}`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify(data)
+      body: formData
     })
     if (!response.ok) throw new Error('Failed to update project')
     return response.json()

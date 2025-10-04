@@ -1,21 +1,49 @@
 import express from 'express'
+import multer from 'multer'
+import path from 'path'
+import fs from 'fs'
 import { prisma } from '../server'
 import { verifyAdmin } from './auth'
 
 const router = express.Router()
 
-// Use LOCAL images instead of Unsplash (since Unsplash seems blocked)
-const SAUDI_NEWS_IMAGES = [
-  "/images/saudi-1.svg",
-  "/images/saudi-2.svg",
-  "/images/saudi-3.svg",
-  "/images/saudi-4.svg",
-  "/images/saudi-5.svg",
-  "/images/saudi-6.svg",
-  "/images/saudi-7.svg"
-];
+// Configure multer for image uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = path.join(__dirname, '../../../frontend/public/images/news')
+    
+    // Create directory if it doesn't exist
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true })
+    }
+    
+    cb(null, uploadDir)
+  },
+  filename: (req, file, cb) => {
+    // Generate unique filename: timestamp-originalname
+    const uniqueName = `${Date.now()}-${file.originalname.replace(/\s+/g, '-')}`
+    cb(null, uniqueName)
+  }
+})
 
-// GET /api/news - Get all news articles (public route)
+const fileFilter = (req: any, file: any, cb: any) => {
+  // Accept images only
+  if (file.mimetype.startsWith('image/')) {
+    cb(null, true)
+  } else {
+    cb(new Error('Only image files are allowed!'), false)
+  }
+}
+
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  }
+})
+
+// GET /api/news - Get all news (public route)
 router.get('/', async (req, res) => {
   try {
     const news = await prisma.news.findMany({
@@ -28,20 +56,14 @@ router.get('/', async (req, res) => {
       orderBy: { createdAt: 'desc' }
     })
     
-    // Use local images
-    const newsWithImages = news.map((article, index) => ({
-      ...article,
-      image: SAUDI_NEWS_IMAGES[index % SAUDI_NEWS_IMAGES.length]
-    }))
-    
-    res.json({ news: newsWithImages })
+    res.json({ news })
   } catch (error) {
     console.error('Get news error:', error)
     res.status(500).json({ error: 'Failed to fetch news' })
   }
 })
 
-// GET /api/news/:id - Get single news article by ID (public route)
+// GET /api/news/:id - Get single news by ID (public route)
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params
@@ -56,45 +78,39 @@ router.get('/:id', async (req, res) => {
     })
     
     if (!news) {
-      return res.status(404).json({ error: 'News article not found' })
-    }
-    
-    // Ensure article has local image
-    if (!news.image || news.image.trim() === '' || news.image.includes('unsplash')) {
-      news.image = SAUDI_NEWS_IMAGES[0]
+      return res.status(404).json({ error: 'News not found' })
     }
     
     res.json(news)
   } catch (error) {
     console.error('Get news by ID error:', error)
-    res.status(500).json({ error: 'Failed to fetch news article' })
+    res.status(500).json({ error: 'Failed to fetch news' })
   }
 })
 
-// POST /api/news - Create new news article (protected)
-router.post('/', verifyAdmin, async (req, res) => {
+// POST /api/news - Create new news with image upload (protected)
+router.post('/', verifyAdmin, upload.single('image'), async (req, res) => {
   try {
-    const { title, summary, content, category, image } = req.body
+    const { title, category, summary, content } = req.body
     const adminId = req.admin!.id
     
-    if (!title || !summary || !content || !category) {
+    if (!title || !category || !summary || !content) {
       return res.status(400).json({ 
-        error: 'Title, summary, content, and category are required' 
+        error: 'Title, category, summary, and content are required' 
       })
     }
     
-    // Get count of existing articles to determine which local image to use
-    const articleCount = await prisma.news.count()
+    // Get image path if uploaded
+    const imagePath = req.file ? `/images/news/${req.file.filename}` : ''
     
     const news = await prisma.news.create({
       data: {
         title,
+        category,
         summary,
         content,
-        category,
-        // Use local image
-        image: SAUDI_NEWS_IMAGES[articleCount % SAUDI_NEWS_IMAGES.length],
-        author: req.admin!.name || req.admin!.email,
+        image: imagePath,
+        author: req.admin!.email,
         readTime: '5 دقائق',
         published: true,
         publishedAt: new Date(),
@@ -105,69 +121,95 @@ router.post('/', verifyAdmin, async (req, res) => {
     res.status(201).json(news)
   } catch (error) {
     console.error('Create news error:', error)
-    res.status(500).json({ error: 'Failed to create news article' })
+    res.status(500).json({ error: 'Failed to create news' })
   }
 })
 
-// PUT /api/news/:id - Update news article (protected)
-router.put('/:id', verifyAdmin, async (req, res) => {
+// PUT /api/news/:id - Update news with optional image upload (protected)
+router.put('/:id', verifyAdmin, upload.single('image'), async (req, res) => {
   try {
     const { id } = req.params
-    const { title, summary, content, category } = req.body
+    const { title, category, summary, content } = req.body
     
-    if (!title || !summary || !content || !category) {
+    if (!title || !category || !summary || !content) {
       return res.status(400).json({ 
-        error: 'Title, summary, content, and category are required' 
+        error: 'Title, category, summary, and content are required' 
       })
     }
     
+    // Check if news exists
     const existingNews = await prisma.news.findUnique({
       where: { id }
     })
     
     if (!existingNews) {
-      return res.status(404).json({ error: 'News article not found' })
+      return res.status(404).json({ error: 'News not found' })
+    }
+    
+    // Prepare update data
+    const updateData: any = {
+      title,
+      category,
+      summary,
+      content,
+      updatedAt: new Date()
+    }
+    
+    // If new image uploaded, delete old one and update path
+    if (req.file) {
+      // Delete old image if it exists
+      if (existingNews.image && existingNews.image.startsWith('/images/news/')) {
+        const oldImagePath = path.join(__dirname, '../../../frontend/public', existingNews.image)
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath)
+        }
+      }
+      
+      updateData.image = `/images/news/${req.file.filename}`
     }
     
     const updatedNews = await prisma.news.update({
       where: { id },
-      data: {
-        title,
-        summary,
-        content,
-        category,
-        updatedAt: new Date()
-      }
+      data: updateData
     })
     
     res.json(updatedNews)
   } catch (error) {
     console.error('Update news error:', error)
-    res.status(500).json({ error: 'Failed to update news article' })
+    res.status(500).json({ error: 'Failed to update news' })
   }
 })
 
-// DELETE /api/news/:id - Delete news article (protected)
+// DELETE /api/news/:id - Delete news (protected)
 router.delete('/:id', verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params
     
+    // Check if news exists
     const existingNews = await prisma.news.findUnique({
       where: { id }
     })
     
     if (!existingNews) {
-      return res.status(404).json({ error: 'News article not found' })
+      return res.status(404).json({ error: 'News not found' })
+    }
+    
+    // Delete associated image if it exists
+    if (existingNews.image && existingNews.image.startsWith('/images/news/')) {
+      const imagePath = path.join(__dirname, '../../../frontend/public', existingNews.image)
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath)
+      }
     }
     
     await prisma.news.delete({
       where: { id }
     })
     
-    res.json({ message: 'News article deleted successfully' })
+    res.json({ message: 'News deleted successfully' })
   } catch (error) {
     console.error('Delete news error:', error)
-    res.status(500).json({ error: 'Failed to delete news article' })
+    res.status(500).json({ error: 'Failed to delete news' })
   }
 })
 

@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { projectsAPI } from "@/lib/api";
@@ -36,6 +35,7 @@ export default function ProjectsPage() {
       try {
         setIsLoading(true);
         const response = await projectsAPI.getAll();
+        console.log("Loaded projects:", response.projects); // Debug log
         setAllProjects(response.projects || []);
       } catch (error) {
         console.error("Failed to load projects:", error);
@@ -88,36 +88,6 @@ export default function ProjectsPage() {
   const handleContact = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     alert(t('projects.cta.description'));
-  };
-
-  const getProjectImage = (project: Project, index: number) => {
-    if (project.image && project.image !== '') {
-      return project.image;
-    }
-    
-    // Saudi Arabian real estate images by project type
-    const defaultImages = {
-      'سكني': [
-        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1549888834-3ec93abae044?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
-      ],
-      'تجاري': [
-        "https://images.unsplash.com/photo-1585665805456-e87f0ec446f5?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1589395937772-e5380caebe6f?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
-      ],
-      'مجمع سكني': [
-        "https://images.unsplash.com/photo-1549888834-3ec93abae044?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
-      ],
-      'فندقي': [
-        "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=400&h=300&fit=crop&auto=format&q=80&fm=webp"
-      ]
-    };
-
-    const typeImages = defaultImages[project.type as keyof typeof defaultImages] || defaultImages['سكني'];
-    return typeImages[index % typeImages.length];
   };
 
   return (
@@ -251,12 +221,10 @@ export default function ProjectsPage() {
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {displayedProjects.map((project, index) => (
+                  {displayedProjects.map((project) => (
                     <ProjectCard 
                       key={project.id} 
                       project={project} 
-                      getProjectImage={getProjectImage}
-                      index={index}
                     />
                   ))}
                 </div>
@@ -369,37 +337,20 @@ export default function ProjectsPage() {
   );
 }
 
-function ProjectCard({ 
-  project, 
-  getProjectImage, 
-  index 
-}: { 
-  project: Project;
-  getProjectImage: (project: Project, index: number) => string;
-  index: number;
-}) {
+function ProjectCard({ project }: { project: Project }) {
   const t = useTranslations();
   const locale = useLocale();
-
-  const handleViewDetails = () => {
-    const displayDate = new Date(project.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-
-    alert(`${project.title}\n\n${project.location}\n${project.price}\n${project.type}\n${displayDate}${project.description ? '\n\n' + project.description : ''}`);
-  };
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover-lift">
       <div className="relative h-48 overflow-hidden">
-        <Image
-          src={getProjectImage(project, index)}
+        <img
+          src={project.image || 'https://images.unsplash.com/photo-1565100952085-229da4491afc?w=800&h=600&fit=crop'}
           alt={project.title}
-          width={400}
-          height={300}
           className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+          onError={(e) => {
+            e.currentTarget.src = 'https://images.unsplash.com/photo-1565100952085-229da4491afc?w=800&h=600&fit=crop';
+          }}
         />
         <div className="absolute top-4 right-4">
           <span className="inline-block bg-omran-teal/90 text-white px-3 py-1 rounded-full text-xs font-semibold">
@@ -416,12 +367,11 @@ function ProjectCard({
           {project.location}
         </p>
         <p className="text-omran-gold font-bold text-lg mb-4">{project.price}</p>
-        <Button 
-          onClick={handleViewDetails}
-          className="w-full bg-omran-teal hover:bg-omran-teal/90 text-white"
-        >
-          {t('common.viewDetails')}
-        </Button>
+        <Link href={`/${locale}/projects/${project.id}`}>
+          <Button className="w-full bg-omran-teal hover:bg-omran-teal/90 text-white">
+            {t('common.viewDetails')}
+          </Button>
+        </Link>
       </div>
     </div>
   );

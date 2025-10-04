@@ -124,7 +124,6 @@ export default function HomePage() {
       return project.image;
     }
     
-    // Saudi Arabian architecture images by project type
     const defaultImages = {
       'سكني': [
         "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
@@ -151,7 +150,6 @@ export default function HomePage() {
       return article.image;
     }
     
-    // Saudi Arabian real estate and investment news images
     const defaultImages = [
       "https://images.unsplash.com/photo-1585665805456-e87f0ec446f5?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
       "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=400&h=300&fit=crop&auto=format&q=80&fm=webp",
@@ -198,7 +196,7 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* Hero Section - Saudi Architecture */}
+      {/* Hero Section */}
       <section className="bg-omran-light py-20 px-4">
         <div className="container mx-auto">
           <div className="flex flex-col lg:flex-row items-center justify-between lg:gap-16">
@@ -465,25 +463,16 @@ function ProjectCard({ project, getProjectImage, index }: ProjectCardProps) {
   const t = useTranslations();
   const locale = useLocale();
 
-  const handleViewDetails = () => {
-    const displayDate = new Date(project.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-
-    alert(`${project.title}\n\n${project.location}\n${project.price}\n${project.type}\n${displayDate}`);
-  };
-
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover-lift">
       <div className="relative h-48 overflow-hidden">
-        <Image
-          src={getProjectImage(project, index)}
+        <img
+          src={project.image || getProjectImage(project, index)}
           alt={project.title}
-          width={400}
-          height={300}
           className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+          onError={(e) => {
+            e.currentTarget.src = getProjectImage(project, index);
+          }}
         />
         <div className="absolute top-4 right-4">
           <span className="inline-block bg-omran-teal/90 text-white px-3 py-1 rounded-full text-xs font-semibold">
@@ -500,12 +489,11 @@ function ProjectCard({ project, getProjectImage, index }: ProjectCardProps) {
           {project.location}
         </p>
         <p className="text-omran-gold font-bold text-lg mb-4">{project.price}</p>
-        <Button 
-          onClick={handleViewDetails}
-          className="w-full bg-omran-teal hover:bg-omran-teal/90 text-white"
-        >
-          {t('common.viewDetails')}
-        </Button>
+        <Link href={`/${locale}/projects/${project.id}`}>
+          <Button className="w-full bg-omran-teal hover:bg-omran-teal/90 text-white">
+            {t('common.viewDetails')}
+          </Button>
+        </Link>
       </div>
     </div>
   );
@@ -515,31 +503,22 @@ function NewsCard({ article, getNewsImage, index }: NewsCardProps) {
   const t = useTranslations();
   const locale = useLocale();
 
-  const handleReadMore = () => {
-    const displayDate = new Date(article.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-
-    alert(`${article.title}\n\n${article.category}\n${displayDate}\n${article.author}\n\n${article.summary}`);
-  };
-
   const displayDate = new Date(article.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', {
     year: 'numeric',
     month: 'long',
-    day:'numeric',
-    });
+    day: 'numeric',
+  });
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover-lift">
       <div className="relative h-48 overflow-hidden">
-        <Image
-          src={getNewsImage(article, index)}
+        <img
+          src={article.image || getNewsImage(article, index)}
           alt={article.title}
-          width={400}
-          height={300}
           className="w-full h-full object-cover"
+          onError={(e) => {
+            e.currentTarget.src = getNewsImage(article, index);
+          }}
         />
         <div className="absolute top-4 right-4">
           <span className="inline-block bg-omran-gold/90 text-white px-3 py-1 rounded-full text-xs font-semibold">
@@ -556,13 +535,14 @@ function NewsCard({ article, getNewsImage, index }: NewsCardProps) {
         </p>
         <div className="flex justify-between items-center text-xs text-gray-500">
           <span>{displayDate}</span>
-          <Button 
-            variant="ghost" 
-            onClick={handleReadMore}
-            className="text-omran-teal hover:text-omran-gold p-0 h-auto"
-          >
-            {t('common.readMore')}
-          </Button>
+          <Link href={`/${locale}/news/${article.id}`}>
+            <Button 
+              variant="ghost" 
+              className="text-omran-teal hover:text-omran-gold p-0 h-auto"
+            >
+              {t('common.readMore')}
+            </Button>
+          </Link>
         </div>
       </div>
     </div>

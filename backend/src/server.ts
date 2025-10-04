@@ -1,3 +1,9 @@
+import { config } from 'dotenv'
+import path from 'path'
+
+// Load environment variables from .env file in project root
+config({ path: path.resolve(__dirname, '../../.env') })
+
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
@@ -58,4 +64,5 @@ process.on('SIGTERM', async () => {
 app.listen(port, () => {
   console.log(`🚀 OMRAN Backend API running on http://localhost:${port}`)
   console.log(`📊 Health check: http://localhost:${port}/health`)
+  console.log(`🗄️  Database: ${process.env.DATABASE_URL || 'Not configured'}`)
 })

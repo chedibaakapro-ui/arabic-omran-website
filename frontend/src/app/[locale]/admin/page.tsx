@@ -157,6 +157,7 @@ function DashboardTab() {
 
 function NewsTab({ token }: { token: string }) {
   const t = useTranslations();
+  const locale = useLocale();
   const [news, setNews] = useState<any[]>([]);
   const [isCreating, setIsCreating] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -166,6 +167,9 @@ function NewsTab({ token }: { token: string }) {
     summary: "",
     content: ""
   });
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const [currentImageUrl, setCurrentImageUrl] = useState<string>("");
 
   useEffect(() => {
     loadNews();
@@ -180,6 +184,29 @@ function NewsTab({ token }: { token: string }) {
     }
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+      
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image size should be less than 5MB');
+        return;
+      }
+
+      setSelectedImage(file);
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -189,15 +216,28 @@ function NewsTab({ token }: { token: string }) {
     }
 
     try {
+      const submitData = new FormData();
+      submitData.append('title', formData.title);
+      submitData.append('category', formData.category);
+      submitData.append('summary', formData.summary);
+      submitData.append('content', formData.content);
+      
+      if (selectedImage) {
+        submitData.append('image', selectedImage);
+      }
+
       if (editingId) {
-        await newsAPI.update(editingId, formData, token);
+        await newsAPI.update(editingId, submitData, token);
         alert(t('admin.news.messages.updated'));
       } else {
-        await newsAPI.create(formData, token);
+        await newsAPI.create(submitData, token);
         alert(t('admin.news.messages.created'));
       }
       
       setFormData({ title: "", category: "أخبار السوق", summary: "", content: "" });
+      setSelectedImage(null);
+      setImagePreview("");
+      setCurrentImageUrl("");
       setIsCreating(false);
       setEditingId(null);
       loadNews();
@@ -214,6 +254,9 @@ function NewsTab({ token }: { token: string }) {
       summary: article.summary,
       content: article.content
     });
+    setCurrentImageUrl(article.image || "");
+    setSelectedImage(null);
+    setImagePreview("");
     setEditingId(article.id);
     setIsCreating(true);
   };
@@ -231,15 +274,26 @@ function NewsTab({ token }: { token: string }) {
     }
   };
 
+  const handleCancelEdit = () => {
+    setIsCreating(false);
+    setEditingId(null);
+    setFormData({ title: "", category: "أخبار السوق", summary: "", content: "" });
+    setSelectedImage(null);
+    setImagePreview("");
+    setCurrentImageUrl("");
+  };
+
   return (
     <div className="max-w-6xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-omran-teal">{t('admin.news.title')}</h2>
         <Button 
           onClick={() => {
-            setIsCreating(!isCreating);
-            setEditingId(null);
-            setFormData({ title: "", category: "أخبار السوق", summary: "", content: "" });
+            if (isCreating) {
+              handleCancelEdit();
+            } else {
+              setIsCreating(true);
+            }
           }}
           className="bg-omran-teal hover:bg-omran-teal/90 text-white"
         >
@@ -254,6 +308,73 @@ function NewsTab({ token }: { token: string }) {
           </h3>
           
           <div className="space-y-4">
+            {/* Image Upload Section */}
+            <div>
+              <Label className="block mb-2">
+                {locale === 'ar' ? 'صورة الخبر' : 'News Image'}
+              </Label>
+              
+              {editingId && currentImageUrl && !imagePreview && (
+                <div className="mb-4">
+                  <p className="text-sm text-gray-600 mb-2">
+                    {locale === 'ar' ? 'الصورة الحالية:' : 'Current Image:'}
+                  </p>
+                  <img 
+                    src={currentImageUrl} 
+                    alt="Current news" 
+                    className="w-full max-w-md h-48 object-cover rounded-lg border-2 border-gray-200"
+                  />
+                </div>
+              )}
+              
+              {imagePreview && (
+                <div className="mb-4">
+                  <p className="text-sm text-gray-600 mb-2">
+                    {locale === 'ar' ? 'معاينة الصورة:' : 'Image Preview:'}
+                  </p>
+                  <img 
+                    src={imagePreview} 
+                    alt="Preview" 
+                    className="w-full max-w-md h-48 object-cover rounded-lg border-2 border-omran-teal"
+                  />
+                </div>
+              )}
+              
+              <div className="flex items-center gap-4">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="block w-full text-sm text-gray-500
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-full file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-omran-teal file:text-white
+                    hover:file:bg-omran-teal/90
+                    cursor-pointer"
+                />
+                {selectedImage && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSelectedImage(null);
+                      setImagePreview("");
+                    }}
+                    className="border-red-500 text-red-500"
+                  >
+                    {locale === 'ar' ? 'إزالة' : 'Remove'}
+                  </Button>
+                )}
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                {locale === 'ar' 
+                  ? 'الحد الأقصى لحجم الصورة: 5 ميجابايت. الصيغ المدعومة: JPG, PNG, WebP' 
+                  : 'Maximum image size: 5MB. Supported formats: JPG, PNG, WebP'}
+              </p>
+            </div>
+
             <div>
               <Label>{t('admin.news.fields.title')}</Label>
               <Input
@@ -323,13 +444,25 @@ function NewsTab({ token }: { token: string }) {
         <div className="space-y-4">
           {news.map((article) => (
             <div key={article.id} className="border-b pb-4 last:border-b-0">
-              <div className="flex justify-between items-start">
+              <div className="flex gap-4">
+                {article.image && (
+                  <img 
+                    src={article.image} 
+                    alt={article.title}
+                    className="w-24 h-24 object-cover rounded-lg flex-shrink-0"
+                    onError={(e) => {
+                      e.currentTarget.src = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=200&h=200&fit=crop';
+                    }}
+                  />
+                )}
+                
                 <div className="flex-1">
                   <h4 className="font-bold text-lg text-omran-teal mb-2">{article.title}</h4>
                   <p className="text-sm text-gray-600 mb-2">{article.category}</p>
                   <p className="text-sm text-gray-600">{article.summary}</p>
                 </div>
-                <div className="flex gap-2">
+                
+                <div className="flex gap-2 flex-shrink-0">
                   <Button 
                     onClick={() => handleEdit(article)}
                     variant="outline"
@@ -358,6 +491,7 @@ function NewsTab({ token }: { token: string }) {
 
 function ProjectsTab({ token }: { token: string }) {
   const t = useTranslations();
+  const locale = useLocale();
   const [projects, setProjects] = useState<any[]>([]);
   const [isCreating, setIsCreating] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -368,6 +502,9 @@ function ProjectsTab({ token }: { token: string }) {
     type: "سكني",
     description: ""
   });
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const [currentImageUrl, setCurrentImageUrl] = useState<string>("");
 
   useEffect(() => {
     loadProjects();
@@ -382,6 +519,32 @@ function ProjectsTab({ token }: { token: string }) {
     }
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+      
+      // Validate file size (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image size should be less than 5MB');
+        return;
+      }
+
+      setSelectedImage(file);
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -391,15 +554,31 @@ function ProjectsTab({ token }: { token: string }) {
     }
 
     try {
+      // Create FormData for file upload
+      const submitData = new FormData();
+      submitData.append('title', formData.title);
+      submitData.append('location', formData.location);
+      submitData.append('price', formData.price);
+      submitData.append('type', formData.type);
+      submitData.append('description', formData.description);
+      
+      if (selectedImage) {
+        submitData.append('image', selectedImage);
+      }
+
       if (editingId) {
-        await projectsAPI.update(editingId, formData, token);
+        await projectsAPI.update(editingId, submitData, token);
         alert(t('admin.projects.messages.updated'));
       } else {
-        await projectsAPI.create(formData, token);
+        await projectsAPI.create(submitData, token);
         alert(t('admin.projects.messages.created'));
       }
       
+      // Reset form
       setFormData({ title: "", location: "", price: "", type: "سكني", description: "" });
+      setSelectedImage(null);
+      setImagePreview("");
+      setCurrentImageUrl("");
       setIsCreating(false);
       setEditingId(null);
       loadProjects();
@@ -417,6 +596,9 @@ function ProjectsTab({ token }: { token: string }) {
       type: project.type,
       description: project.description || ""
     });
+    setCurrentImageUrl(project.image || "");
+    setSelectedImage(null);
+    setImagePreview("");
     setEditingId(project.id);
     setIsCreating(true);
   };
@@ -434,15 +616,26 @@ function ProjectsTab({ token }: { token: string }) {
     }
   };
 
+  const handleCancelEdit = () => {
+    setIsCreating(false);
+    setEditingId(null);
+    setFormData({ title: "", location: "", price: "", type: "سكني", description: "" });
+    setSelectedImage(null);
+    setImagePreview("");
+    setCurrentImageUrl("");
+  };
+
   return (
     <div className="max-w-6xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-omran-teal">{t('admin.projects.title')}</h2>
         <Button 
           onClick={() => {
-            setIsCreating(!isCreating);
-            setEditingId(null);
-            setFormData({ title: "", location: "", price: "", type: "سكني", description: "" });
+            if (isCreating) {
+              handleCancelEdit();
+            } else {
+              setIsCreating(true);
+            }
           }}
           className="bg-omran-teal hover:bg-omran-teal/90 text-white"
         >
@@ -457,6 +650,76 @@ function ProjectsTab({ token }: { token: string }) {
           </h3>
           
           <div className="space-y-4">
+            {/* Image Upload Section */}
+            <div>
+              <Label className="block mb-2">
+                {locale === 'ar' ? 'صورة المشروع' : 'Project Image'}
+              </Label>
+              
+              {/* Current Image Display (when editing) */}
+              {editingId && currentImageUrl && !imagePreview && (
+                <div className="mb-4">
+                  <p className="text-sm text-gray-600 mb-2">
+                    {locale === 'ar' ? 'الصورة الحالية:' : 'Current Image:'}
+                  </p>
+                  <img 
+                    src={currentImageUrl} 
+                    alt="Current project" 
+                    className="w-full max-w-md h-48 object-cover rounded-lg border-2 border-gray-200"
+                  />
+                </div>
+              )}
+              
+              {/* Image Preview (for new upload) */}
+              {imagePreview && (
+                <div className="mb-4">
+                  <p className="text-sm text-gray-600 mb-2">
+                    {locale === 'ar' ? 'معاينة الصورة:' : 'Image Preview:'}
+                  </p>
+                  <img 
+                    src={imagePreview} 
+                    alt="Preview" 
+                    className="w-full max-w-md h-48 object-cover rounded-lg border-2 border-omran-teal"
+                  />
+                </div>
+              )}
+              
+              {/* File Input */}
+              <div className="flex items-center gap-4">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="block w-full text-sm text-gray-500
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-full file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-omran-teal file:text-white
+                    hover:file:bg-omran-teal/90
+                    cursor-pointer"
+                />
+                {selectedImage && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSelectedImage(null);
+                      setImagePreview("");
+                    }}
+                    className="border-red-500 text-red-500"
+                  >
+                    {locale === 'ar' ? 'إزالة' : 'Remove'}
+                  </Button>
+                )}
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                {locale === 'ar' 
+                  ? 'الحد الأقصى لحجم الصورة: 5 ميجابايت. الصيغ المدعومة: JPG, PNG, WebP' 
+                  : 'Maximum image size: 5MB. Supported formats: JPG, PNG, WebP'}
+              </p>
+            </div>
+
             <div>
               <Label>{t('admin.projects.fields.title')}</Label>
               <Input
@@ -538,7 +801,19 @@ function ProjectsTab({ token }: { token: string }) {
         <div className="space-y-4">
           {projects.map((project) => (
             <div key={project.id} className="border-b pb-4 last:border-b-0">
-              <div className="flex justify-between items-start">
+              <div className="flex gap-4">
+                {/* Project Image Thumbnail */}
+                {project.image && (
+                  <img 
+                    src={project.image} 
+                    alt={project.title}
+                    className="w-24 h-24 object-cover rounded-lg flex-shrink-0"
+                    onError={(e) => {
+                      e.currentTarget.src = 'https://images.unsplash.com/photo-1565100952085-229da4491afc?w=200&h=200&fit=crop';
+                    }}
+                  />
+                )}
+                
                 <div className="flex-1">
                   <h4 className="font-bold text-lg text-omran-teal mb-2">{project.title}</h4>
                   <p className="text-sm text-gray-600 mb-1">
@@ -551,7 +826,8 @@ function ProjectsTab({ token }: { token: string }) {
                     <span className="font-semibold">{t('admin.projects.fields.type')}:</span> {project.type}
                   </p>
                 </div>
-                <div className="flex gap-2">
+                
+                <div className="flex gap-2 flex-shrink-0">
                   <Button 
                     onClick={() => handleEdit(project)}
                     variant="outline"
